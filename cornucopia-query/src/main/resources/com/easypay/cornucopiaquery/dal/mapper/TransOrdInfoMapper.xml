@@ -1,29 +1,260 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.easypay.cornucopiaquery.dal.dao.TransOrdInfoMapper" >
-  <resultMap id="BaseResultMap" type="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo" >
-    <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="trans_date" property="transDate" jdbcType="VARCHAR" />
-    <result column="sqe_id" property="sqeId" jdbcType="VARCHAR" />
-    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easypay.cornucopiaquery.dal.dao.TransOrdInfoMapper">
+  <resultMap id="BaseResultMap" type="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="trans_date" jdbcType="VARCHAR" property="transDate" />
+    <result column="sqe_id" jdbcType="VARCHAR" property="sqeId" />
+    <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+    <result column="order_amt" jdbcType="DECIMAL" property="orderAmt" />
+    <result column="order_state" jdbcType="VARCHAR" property="orderState" />
+    <result column="fee_amt" jdbcType="DECIMAL" property="feeAmt" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_lat" jdbcType="DECIMAL" property="userLat" />
+    <result column="user_lng" jdbcType="DECIMAL" property="userLng" />
+    <result column="channel_no" jdbcType="VARCHAR" property="channelNo" />
+    <result column="sync_resp_code" jdbcType="VARCHAR" property="syncRespCode" />
+    <result column="sync_resp_desc" jdbcType="VARCHAR" property="syncRespDesc" />
+    <result column="async_resp_code" jdbcType="VARCHAR" property="asyncRespCode" />
+    <result column="async_resp_desc" jdbcType="VARCHAR" property="asyncRespDesc" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, trans_date, sqe_id, order_id, create_time, update_time
+  <sql id="Base_Column_List">
+    id, trans_date, sqe_id, order_id, order_amt, order_state, fee_amt, user_id, user_lat, 
+    user_lng, channel_no, sync_resp_code, sync_resp_desc, async_resp_code, async_resp_desc, 
+    create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from trans_ord_info
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from trans_ord_info
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo" >
-    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+  <insert id="insert" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into trans_ord_info (trans_date, sqe_id, order_id, 
+      order_amt, order_state, fee_amt, 
+      user_id, user_lat, user_lng, 
+      channel_no, sync_resp_code, sync_resp_desc, 
+      async_resp_code, async_resp_desc, create_time, 
+      update_time)
+    values (#{transDate,jdbcType=VARCHAR}, #{sqeId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
+      #{orderAmt,jdbcType=DECIMAL}, #{orderState,jdbcType=VARCHAR}, #{feeAmt,jdbcType=DECIMAL}, 
+      #{userId,jdbcType=VARCHAR}, #{userLat,jdbcType=DECIMAL}, #{userLng,jdbcType=DECIMAL}, 
+      #{channelNo,jdbcType=VARCHAR}, #{syncRespCode,jdbcType=VARCHAR}, #{syncRespDesc,jdbcType=VARCHAR}, 
+      #{asyncRespCode,jdbcType=VARCHAR}, #{asyncRespDesc,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into trans_ord_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="transDate != null">
+        trans_date,
+      </if>
+      <if test="sqeId != null">
+        sqe_id,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="orderAmt != null">
+        order_amt,
+      </if>
+      <if test="orderState != null">
+        order_state,
+      </if>
+      <if test="feeAmt != null">
+        fee_amt,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userLat != null">
+        user_lat,
+      </if>
+      <if test="userLng != null">
+        user_lng,
+      </if>
+      <if test="channelNo != null">
+        channel_no,
+      </if>
+      <if test="syncRespCode != null">
+        sync_resp_code,
+      </if>
+      <if test="syncRespDesc != null">
+        sync_resp_desc,
+      </if>
+      <if test="asyncRespCode != null">
+        async_resp_code,
+      </if>
+      <if test="asyncRespDesc != null">
+        async_resp_desc,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="transDate != null">
+        #{transDate,jdbcType=VARCHAR},
+      </if>
+      <if test="sqeId != null">
+        #{sqeId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null">
+        #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="orderState != null">
+        #{orderState,jdbcType=VARCHAR},
+      </if>
+      <if test="feeAmt != null">
+        #{feeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userLat != null">
+        #{userLat,jdbcType=DECIMAL},
+      </if>
+      <if test="userLng != null">
+        #{userLng,jdbcType=DECIMAL},
+      </if>
+      <if test="channelNo != null">
+        #{channelNo,jdbcType=VARCHAR},
+      </if>
+      <if test="syncRespCode != null">
+        #{syncRespCode,jdbcType=VARCHAR},
+      </if>
+      <if test="syncRespDesc != null">
+        #{syncRespDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="asyncRespCode != null">
+        #{asyncRespCode,jdbcType=VARCHAR},
+      </if>
+      <if test="asyncRespDesc != null">
+        #{asyncRespDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    update trans_ord_info
+    <set>
+      <if test="transDate != null">
+        trans_date = #{transDate,jdbcType=VARCHAR},
+      </if>
+      <if test="sqeId != null">
+        sqe_id = #{sqeId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null">
+        order_amt = #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="orderState != null">
+        order_state = #{orderState,jdbcType=VARCHAR},
+      </if>
+      <if test="feeAmt != null">
+        fee_amt = #{feeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userLat != null">
+        user_lat = #{userLat,jdbcType=DECIMAL},
+      </if>
+      <if test="userLng != null">
+        user_lng = #{userLng,jdbcType=DECIMAL},
+      </if>
+      <if test="channelNo != null">
+        channel_no = #{channelNo,jdbcType=VARCHAR},
+      </if>
+      <if test="syncRespCode != null">
+        sync_resp_code = #{syncRespCode,jdbcType=VARCHAR},
+      </if>
+      <if test="syncRespDesc != null">
+        sync_resp_desc = #{syncRespDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="asyncRespCode != null">
+        async_resp_code = #{asyncRespCode,jdbcType=VARCHAR},
+      </if>
+      <if test="asyncRespDesc != null">
+        async_resp_desc = #{asyncRespDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    update trans_ord_info
+    set trans_date = #{transDate,jdbcType=VARCHAR},
+      sqe_id = #{sqeId,jdbcType=VARCHAR},
+      order_id = #{orderId,jdbcType=VARCHAR},
+      order_amt = #{orderAmt,jdbcType=DECIMAL},
+      order_state = #{orderState,jdbcType=VARCHAR},
+      fee_amt = #{feeAmt,jdbcType=DECIMAL},
+      user_id = #{userId,jdbcType=VARCHAR},
+      user_lat = #{userLat,jdbcType=DECIMAL},
+      user_lng = #{userLng,jdbcType=DECIMAL},
+      channel_no = #{channelNo,jdbcType=VARCHAR},
+      sync_resp_code = #{syncRespCode,jdbcType=VARCHAR},
+      sync_resp_desc = #{syncRespDesc,jdbcType=VARCHAR},
+      async_resp_code = #{asyncRespCode,jdbcType=VARCHAR},
+      async_resp_desc = #{asyncRespDesc,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <resultMap id="BaseResultMap" type="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="trans_date" jdbcType="VARCHAR" property="transDate" />
+    <result column="sqe_id" jdbcType="VARCHAR" property="sqeId" />
+    <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, trans_date, sqe_id, order_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from trans_ord_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from trans_ord_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into trans_ord_info (trans_date, sqe_id, order_id, 
@@ -31,68 +262,68 @@
     values (#{transDate,jdbcType=VARCHAR}, #{sqeId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo" >
-    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+  <insert id="insertSelective" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into trans_ord_info
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="transDate != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="transDate != null">
         trans_date,
       </if>
-      <if test="sqeId != null" >
+      <if test="sqeId != null">
         sqe_id,
       </if>
-      <if test="orderId != null" >
+      <if test="orderId != null">
         order_id,
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="transDate != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="transDate != null">
         #{transDate,jdbcType=VARCHAR},
       </if>
-      <if test="sqeId != null" >
+      <if test="sqeId != null">
         #{sqeId,jdbcType=VARCHAR},
       </if>
-      <if test="orderId != null" >
+      <if test="orderId != null">
         #{orderId,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
     update trans_ord_info
-    <set >
-      <if test="transDate != null" >
+    <set>
+      <if test="transDate != null">
         trans_date = #{transDate,jdbcType=VARCHAR},
       </if>
-      <if test="sqeId != null" >
+      <if test="sqeId != null">
         sqe_id = #{sqeId,jdbcType=VARCHAR},
       </if>
-      <if test="orderId != null" >
+      <if test="orderId != null">
         order_id = #{orderId,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo" >
+  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiaquery.dal.pojo.TransOrdInfo">
     update trans_ord_info
     set trans_date = #{transDate,jdbcType=VARCHAR},
       sqe_id = #{sqeId,jdbcType=VARCHAR},

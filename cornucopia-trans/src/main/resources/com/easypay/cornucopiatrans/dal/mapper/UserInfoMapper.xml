@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easypay.cornucopiatrans.dal.dao.UserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.easypay.cornucopiatrans.dal.pojo.UserInfo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="user_state" property="userState" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="legel_name" property="legelName" jdbcType="VARCHAR" />
+    <result column="id_no" property="idNo" jdbcType="VARCHAR" />
+    <result column="id_photo_f" property="idPhotoF" jdbcType="VARCHAR" />
+    <result column="id_photo_b" property="idPhotoB" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, user_state, user_name, legel_name, id_no, id_photo_f, id_photo_b, create_time, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from user_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserInfo" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user_info (user_id, user_state, user_name, 
+      legel_name, id_no, id_photo_f, 
+      id_photo_b, create_time, update_time
+      )
+    values (#{userId,jdbcType=VARCHAR}, #{userState,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, 
+      #{legelName,jdbcType=VARCHAR}, #{idNo,jdbcType=VARCHAR}, #{idPhotoF,jdbcType=VARCHAR}, 
+      #{idPhotoB,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserInfo" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="userState != null" >
+        user_state,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="legelName != null" >
+        legel_name,
+      </if>
+      <if test="idNo != null" >
+        id_no,
+      </if>
+      <if test="idPhotoF != null" >
+        id_photo_f,
+      </if>
+      <if test="idPhotoB != null" >
+        id_photo_b,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null" >
+        #{userState,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="legelName != null" >
+        #{legelName,jdbcType=VARCHAR},
+      </if>
+      <if test="idNo != null" >
+        #{idNo,jdbcType=VARCHAR},
+      </if>
+      <if test="idPhotoF != null" >
+        #{idPhotoF,jdbcType=VARCHAR},
+      </if>
+      <if test="idPhotoB != null" >
+        #{idPhotoB,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserInfo" >
+    update user_info
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null" >
+        user_state = #{userState,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="legelName != null" >
+        legel_name = #{legelName,jdbcType=VARCHAR},
+      </if>
+      <if test="idNo != null" >
+        id_no = #{idNo,jdbcType=VARCHAR},
+      </if>
+      <if test="idPhotoF != null" >
+        id_photo_f = #{idPhotoF,jdbcType=VARCHAR},
+      </if>
+      <if test="idPhotoB != null" >
+        id_photo_b = #{idPhotoB,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserInfo" >
+    update user_info
+    set user_id = #{userId,jdbcType=VARCHAR},
+      user_state = #{userState,jdbcType=VARCHAR},
+      user_name = #{userName,jdbcType=VARCHAR},
+      legel_name = #{legelName,jdbcType=VARCHAR},
+      id_no = #{idNo,jdbcType=VARCHAR},
+      id_photo_f = #{idPhotoF,jdbcType=VARCHAR},
+      id_photo_b = #{idPhotoB,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

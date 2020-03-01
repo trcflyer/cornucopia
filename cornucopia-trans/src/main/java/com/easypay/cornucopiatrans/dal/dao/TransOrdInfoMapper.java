@@ -2,7 +2,6 @@ package com.easypay.cornucopiatrans.dal.dao;
 
 import com.easypay.cornucopiatrans.dal.pojo.TransOrdInfo;
 
-
 public interface TransOrdInfoMapper {
     int deleteByPrimaryKey(Long id);
 
