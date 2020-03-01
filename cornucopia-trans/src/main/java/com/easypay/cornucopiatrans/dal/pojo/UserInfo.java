@@ -7,8 +7,6 @@ public class UserInfo {
 
     private String userId;
 
-    private String userState;
-
     private String userName;
 
     private String legelName;
@@ -37,14 +35,6 @@ public class UserInfo {
 
     public void setUserId(String userId) {
         this.userId = userId == null ? null : userId.trim();
-    }
-
-    public String getUserState() {
-        return userState;
-    }
-
-    public void setUserState(String userState) {
-        this.userState = userState == null ? null : userState.trim();
     }
 
     public String getUserName() {

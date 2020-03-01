@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@RestController
+@RestController("trans")
 public class LoginController {
 
     @Autowired
     private LoginServiceImpl loginService;
 
-    @RequestMapping("login")
+    @RequestMapping("/login")
     public CommonResult login(VoLogin voLogin){
         ResultLogin  resultLogin = loginService.login( voLogin);
         if (resultLogin == null){

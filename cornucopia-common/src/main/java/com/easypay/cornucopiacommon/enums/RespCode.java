@@ -2,7 +2,9 @@ package com.easypay.cornucopiacommon.enums;
 
 public enum RespCode {
     CODE_000("000","成功"),
-    CODE_001("001","用户名密码错误");
+    CODE_001("001","用户名密码错误"),
+    CODE_002("002","注册失败")
+    ;
 
     // 成员变量
     private String RespCode;

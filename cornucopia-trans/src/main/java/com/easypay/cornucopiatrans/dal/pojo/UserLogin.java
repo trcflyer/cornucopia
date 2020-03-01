@@ -7,11 +7,13 @@ public class UserLogin {
 
     private String userId;
 
+    private Integer userState;
+
     private String loginId;
 
     private String loginPswd;
 
-    private Byte pswdFailCount;
+    private Integer pswdFailCount;
 
     private String userFrom;
 
@@ -35,6 +37,14 @@ public class UserLogin {
         this.userId = userId == null ? null : userId.trim();
     }
 
+    public Integer getUserState() {
+        return userState;
+    }
+
+    public void setUserState(Integer userState) {
+        this.userState = userState;
+    }
+
     public String getLoginId() {
         return loginId;
     }
@@ -51,11 +61,11 @@ public class UserLogin {
         this.loginPswd = loginPswd == null ? null : loginPswd.trim();
     }
 
-    public Byte getPswdFailCount() {
+    public Integer getPswdFailCount() {
         return pswdFailCount;
     }
 
-    public void setPswdFailCount(Byte pswdFailCount) {
+    public void setPswdFailCount(Integer pswdFailCount) {
         this.pswdFailCount = pswdFailCount;
     }
 

@@ -1,31 +1,303 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.easypay.cornucopiatrans.dal.dao.UserLoginMapper" >
-  <resultMap id="BaseResultMap" type="com.easypay.cornucopiatrans.dal.pojo.UserLogin" >
-    <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="user_id" property="userId" jdbcType="VARCHAR" />
-    <result column="login_id" property="loginId" jdbcType="VARCHAR" />
-    <result column="login_pswd" property="loginPswd" jdbcType="VARCHAR" />
-    <result column="pswd_fail_count" property="pswdFailCount" jdbcType="TINYINT" />
-    <result column="user_from" property="userFrom" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easypay.cornucopiatrans.dal.dao.UserLoginMapper">
+  <resultMap id="BaseResultMap" type="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_state" jdbcType="INTEGER" property="userState" />
+    <result column="login_id" jdbcType="VARCHAR" property="loginId" />
+    <result column="login_pswd" jdbcType="VARCHAR" property="loginPswd" />
+    <result column="pswd_fail_count" jdbcType="INTEGER" property="pswdFailCount" />
+    <result column="user_from" jdbcType="VARCHAR" property="userFrom" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, user_id, login_id, login_pswd, pswd_fail_count, user_from, create_time, update_time
+  <sql id="Base_Column_List">
+    id, user_id, user_state, login_id, login_pswd, pswd_fail_count, user_from, create_time, 
+    update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from user_login
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from user_login
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin" >
-    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+  <insert id="insert" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user_login (user_id, user_state, login_id, 
+      login_pswd, pswd_fail_count, user_from, 
+      create_time, update_time)
+    values (#{userId,jdbcType=VARCHAR}, #{userState,jdbcType=INTEGER}, #{loginId,jdbcType=VARCHAR}, 
+      #{loginPswd,jdbcType=VARCHAR}, #{pswdFailCount,jdbcType=INTEGER}, #{userFrom,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user_login
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userState != null">
+        user_state,
+      </if>
+      <if test="loginId != null">
+        login_id,
+      </if>
+      <if test="loginPswd != null">
+        login_pswd,
+      </if>
+      <if test="pswdFailCount != null">
+        pswd_fail_count,
+      </if>
+      <if test="userFrom != null">
+        user_from,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null">
+        #{userState,jdbcType=INTEGER},
+      </if>
+      <if test="loginId != null">
+        #{loginId,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPswd != null">
+        #{loginPswd,jdbcType=VARCHAR},
+      </if>
+      <if test="pswdFailCount != null">
+        #{pswdFailCount,jdbcType=INTEGER},
+      </if>
+      <if test="userFrom != null">
+        #{userFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    update user_login
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null">
+        user_state = #{userState,jdbcType=INTEGER},
+      </if>
+      <if test="loginId != null">
+        login_id = #{loginId,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPswd != null">
+        login_pswd = #{loginPswd,jdbcType=VARCHAR},
+      </if>
+      <if test="pswdFailCount != null">
+        pswd_fail_count = #{pswdFailCount,jdbcType=INTEGER},
+      </if>
+      <if test="userFrom != null">
+        user_from = #{userFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    update user_login
+    set user_id = #{userId,jdbcType=VARCHAR},
+      user_state = #{userState,jdbcType=INTEGER},
+      login_id = #{loginId,jdbcType=VARCHAR},
+      login_pswd = #{loginPswd,jdbcType=VARCHAR},
+      pswd_fail_count = #{pswdFailCount,jdbcType=INTEGER},
+      user_from = #{userFrom,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <resultMap id="BaseResultMap" type="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_state" jdbcType="TINYINT" property="userState" />
+    <result column="login_id" jdbcType="VARCHAR" property="loginId" />
+    <result column="login_pswd" jdbcType="VARCHAR" property="loginPswd" />
+    <result column="pswd_fail_count" jdbcType="TINYINT" property="pswdFailCount" />
+    <result column="user_from" jdbcType="VARCHAR" property="userFrom" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, user_state, login_id, login_pswd, pswd_fail_count, user_from, create_time, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_login
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from user_login
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user_login (user_id, user_state, login_id, 
+      login_pswd, pswd_fail_count, user_from, 
+      create_time, update_time)
+    values (#{userId,jdbcType=VARCHAR}, #{userState,jdbcType=TINYINT}, #{loginId,jdbcType=VARCHAR}, 
+      #{loginPswd,jdbcType=VARCHAR}, #{pswdFailCount,jdbcType=TINYINT}, #{userFrom,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user_login
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userState != null">
+        user_state,
+      </if>
+      <if test="loginId != null">
+        login_id,
+      </if>
+      <if test="loginPswd != null">
+        login_pswd,
+      </if>
+      <if test="pswdFailCount != null">
+        pswd_fail_count,
+      </if>
+      <if test="userFrom != null">
+        user_from,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null">
+        #{userState,jdbcType=TINYINT},
+      </if>
+      <if test="loginId != null">
+        #{loginId,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPswd != null">
+        #{loginPswd,jdbcType=VARCHAR},
+      </if>
+      <if test="pswdFailCount != null">
+        #{pswdFailCount,jdbcType=TINYINT},
+      </if>
+      <if test="userFrom != null">
+        #{userFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    update user_login
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null">
+        user_state = #{userState,jdbcType=TINYINT},
+      </if>
+      <if test="loginId != null">
+        login_id = #{loginId,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPswd != null">
+        login_pswd = #{loginPswd,jdbcType=VARCHAR},
+      </if>
+      <if test="pswdFailCount != null">
+        pswd_fail_count = #{pswdFailCount,jdbcType=TINYINT},
+      </if>
+      <if test="userFrom != null">
+        user_from = #{userFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    update user_login
+    set user_id = #{userId,jdbcType=VARCHAR},
+      user_state = #{userState,jdbcType=TINYINT},
+      login_id = #{loginId,jdbcType=VARCHAR},
+      login_pswd = #{loginPswd,jdbcType=VARCHAR},
+      pswd_fail_count = #{pswdFailCount,jdbcType=TINYINT},
+      user_from = #{userFrom,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <resultMap id="BaseResultMap" type="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="login_id" jdbcType="VARCHAR" property="loginId" />
+    <result column="login_pswd" jdbcType="VARCHAR" property="loginPswd" />
+    <result column="pswd_fail_count" jdbcType="TINYINT" property="pswdFailCount" />
+    <result column="user_from" jdbcType="VARCHAR" property="userFrom" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, login_id, login_pswd, pswd_fail_count, user_from, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_login
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from user_login
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into user_login (user_id, login_id, login_pswd, 
@@ -35,86 +307,86 @@
       #{pswdFailCount,jdbcType=TINYINT}, #{userFrom,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin" >
-    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+  <insert id="insertSelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into user_login
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="userId != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
         user_id,
       </if>
-      <if test="loginId != null" >
+      <if test="loginId != null">
         login_id,
       </if>
-      <if test="loginPswd != null" >
+      <if test="loginPswd != null">
         login_pswd,
       </if>
-      <if test="pswdFailCount != null" >
+      <if test="pswdFailCount != null">
         pswd_fail_count,
       </if>
-      <if test="userFrom != null" >
+      <if test="userFrom != null">
         user_from,
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="userId != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
         #{userId,jdbcType=VARCHAR},
       </if>
-      <if test="loginId != null" >
+      <if test="loginId != null">
         #{loginId,jdbcType=VARCHAR},
       </if>
-      <if test="loginPswd != null" >
+      <if test="loginPswd != null">
         #{loginPswd,jdbcType=VARCHAR},
       </if>
-      <if test="pswdFailCount != null" >
+      <if test="pswdFailCount != null">
         #{pswdFailCount,jdbcType=TINYINT},
       </if>
-      <if test="userFrom != null" >
+      <if test="userFrom != null">
         #{userFrom,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
     update user_login
-    <set >
-      <if test="userId != null" >
+    <set>
+      <if test="userId != null">
         user_id = #{userId,jdbcType=VARCHAR},
       </if>
-      <if test="loginId != null" >
+      <if test="loginId != null">
         login_id = #{loginId,jdbcType=VARCHAR},
       </if>
-      <if test="loginPswd != null" >
+      <if test="loginPswd != null">
         login_pswd = #{loginPswd,jdbcType=VARCHAR},
       </if>
-      <if test="pswdFailCount != null" >
+      <if test="pswdFailCount != null">
         pswd_fail_count = #{pswdFailCount,jdbcType=TINYINT},
       </if>
-      <if test="userFrom != null" >
+      <if test="userFrom != null">
         user_from = #{userFrom,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin" >
+  <update id="updateByPrimaryKey" parameterType="com.easypay.cornucopiatrans.dal.pojo.UserLogin">
     update user_login
     set user_id = #{userId,jdbcType=VARCHAR},
       login_id = #{loginId,jdbcType=VARCHAR},
