@@ -6,8 +6,7 @@ import lombok.Data;
 @Data
 public class VoLogin  extends BaseRequest {
 
-    private String loginId;
-    private String loginPswd;
+    private String openId;
 
 
 }

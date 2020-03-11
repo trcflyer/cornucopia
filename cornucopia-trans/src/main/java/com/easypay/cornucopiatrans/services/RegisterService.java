@@ -5,5 +5,5 @@ import com.easypay.cornucopiatrans.vo.response.ResultRegister;
 
 public interface RegisterService {
 
-    public ResultRegister register(VoRegister voLogin);
+    public ResultRegister register(VoRegister voLogin,String userFrom);
 }

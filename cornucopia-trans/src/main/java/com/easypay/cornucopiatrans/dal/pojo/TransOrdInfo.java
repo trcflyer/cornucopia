@@ -1,5 +1,6 @@
 package com.easypay.cornucopiatrans.dal.pojo;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class TransOrdInfo {
@@ -11,19 +12,21 @@ public class TransOrdInfo {
 
     private String orderId;
 
-    private Long orderAmt;
+    private BigDecimal orderAmt;
 
     private String orderState;
 
-    private Long feeAmt;
+    private BigDecimal feeAmt;
 
     private String userId;
 
-    private Long userLat;
+    private String userLat;
 
-    private Long userLng;
+    private String userLng;
 
     private String channelNo;
+
+    private String quickSqeId;
 
     private String syncRespCode;
 
@@ -69,11 +72,11 @@ public class TransOrdInfo {
         this.orderId = orderId == null ? null : orderId.trim();
     }
 
-    public Long getOrderAmt() {
+    public BigDecimal getOrderAmt() {
         return orderAmt;
     }
 
-    public void setOrderAmt(Long orderAmt) {
+    public void setOrderAmt(BigDecimal orderAmt) {
         this.orderAmt = orderAmt;
     }
 
@@ -85,11 +88,11 @@ public class TransOrdInfo {
         this.orderState = orderState == null ? null : orderState.trim();
     }
 
-    public Long getFeeAmt() {
+    public BigDecimal getFeeAmt() {
         return feeAmt;
     }
 
-    public void setFeeAmt(Long feeAmt) {
+    public void setFeeAmt(BigDecimal feeAmt) {
         this.feeAmt = feeAmt;
     }
 
@@ -101,20 +104,20 @@ public class TransOrdInfo {
         this.userId = userId == null ? null : userId.trim();
     }
 
-    public Long getUserLat() {
+    public String getUserLat() {
         return userLat;
     }
 
-    public void setUserLat(Long userLat) {
-        this.userLat = userLat;
+    public void setUserLat(String userLat) {
+        this.userLat = userLat == null ? null : userLat.trim();
     }
 
-    public Long getUserLng() {
+    public String getUserLng() {
         return userLng;
     }
 
-    public void setUserLng(Long userLng) {
-        this.userLng = userLng;
+    public void setUserLng(String userLng) {
+        this.userLng = userLng == null ? null : userLng.trim();
     }
 
     public String getChannelNo() {
@@ -123,6 +126,14 @@ public class TransOrdInfo {
 
     public void setChannelNo(String channelNo) {
         this.channelNo = channelNo == null ? null : channelNo.trim();
+    }
+
+    public String getQuickSqeId() {
+        return quickSqeId;
+    }
+
+    public void setQuickSqeId(String quickSqeId) {
+        this.quickSqeId = quickSqeId == null ? null : quickSqeId.trim();
     }
 
     public String getSyncRespCode() {

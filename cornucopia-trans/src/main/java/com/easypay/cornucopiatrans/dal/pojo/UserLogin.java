@@ -13,9 +13,7 @@ public class UserLogin {
 
     private String loginPswd;
 
-    private Integer pswdFailCount;
-
-    private String userFrom;
+    private Integer userFrom;
 
     private Date createTime;
 
@@ -61,20 +59,12 @@ public class UserLogin {
         this.loginPswd = loginPswd == null ? null : loginPswd.trim();
     }
 
-    public Integer getPswdFailCount() {
-        return pswdFailCount;
-    }
-
-    public void setPswdFailCount(Integer pswdFailCount) {
-        this.pswdFailCount = pswdFailCount;
-    }
-
-    public String getUserFrom() {
+    public Integer getUserFrom() {
         return userFrom;
     }
 
-    public void setUserFrom(String userFrom) {
-        this.userFrom = userFrom == null ? null : userFrom.trim();
+    public void setUserFrom(Integer userFrom) {
+        this.userFrom = userFrom;
     }
 
     public Date getCreateTime() {

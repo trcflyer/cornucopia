@@ -18,7 +18,7 @@ public class LoginController {
     @Autowired
     private LoginServiceImpl loginService;
 
-    @RequestMapping("/login")
+    @RequestMapping("/wechat/login")
     public CommonResult login(VoLogin voLogin){
         ResultLogin  resultLogin = loginService.login( voLogin);
         if (resultLogin == null){

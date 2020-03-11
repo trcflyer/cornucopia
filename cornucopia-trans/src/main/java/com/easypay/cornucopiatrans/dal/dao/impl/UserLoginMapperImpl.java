@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserLoginMapperImpl extends UserLoginMapper {
 
-    UserLogin selectByLogin(@Param("loginId") String loginId,@Param("userState") String userState,@Param("loginPswd") String loginPswd);
+    UserLogin selectByLogin(@Param("loginId") String loginId,@Param("userState") String userState);
 
 
 }

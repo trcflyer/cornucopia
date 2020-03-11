@@ -7,6 +7,8 @@ public class UserInfo {
 
     private String userId;
 
+    private Integer userLevel;
+
     private String userName;
 
     private String legelName;
@@ -35,6 +37,14 @@ public class UserInfo {
 
     public void setUserId(String userId) {
         this.userId = userId == null ? null : userId.trim();
+    }
+
+    public Integer getUserLevel() {
+        return userLevel;
+    }
+
+    public void setUserLevel(Integer userLevel) {
+        this.userLevel = userLevel;
     }
 
     public String getUserName() {

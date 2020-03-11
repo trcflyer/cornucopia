@@ -1,22 +1,22 @@
 package com.easypay.cornucopiatrans.vo;
 
 public class BaseResponse {
-    public String RespCode;
-    public String RespDesc;
+    public String respCode;
+    public String respDesc;
 
     public String getRespCode() {
-        return RespCode;
+        return respCode;
     }
 
     public void setRespCode(String respCode) {
-        RespCode = respCode;
+        this.respCode = respCode;
     }
 
     public String getRespDesc() {
-        return RespDesc;
+        return respDesc;
     }
 
     public void setRespDesc(String respDesc) {
-        RespDesc = respDesc;
+        this.respDesc = respDesc;
     }
 }

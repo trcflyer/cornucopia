@@ -14,23 +14,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@RestController("trans")
+@RestController("/trans")
 public class RegisterController {
 
     @Autowired
     private RegisterServiceImpl registerService;
 
-    @RequestMapping("/register")
-    public CommonResult register(VoRegister voLogin){
-        ResultRegister resultRegister = registerService.register( voLogin);
+    @RequestMapping("/wechat/register")
+    public CommonResult register(VoRegister voRegister){
+        ResultRegister resultRegister = registerService.register( voRegister,"1");
         if (resultRegister == null){
             resultRegister.setRespCode(RespCode.CODE_002.getRespCode());
             resultRegister.setRespDesc(RespCode.CODE_002.getRespCode());
             return CommonResult.failed(JSONObject.toJSONString(resultRegister));
         }
-
-        resultRegister.setRespCode(RespCode.CODE_000.getRespCode());
-        resultRegister.setRespDesc(RespCode.CODE_000.getRespCode());
         return CommonResult.success(JSONObject.toJSONString(resultRegister));
     }
 }
