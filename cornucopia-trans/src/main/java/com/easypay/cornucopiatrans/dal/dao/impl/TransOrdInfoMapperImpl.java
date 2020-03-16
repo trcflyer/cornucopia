@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+
 @Repository
 public interface TransOrdInfoMapperImpl extends TransOrdInfoMapper {
 
@@ -18,5 +20,13 @@ public interface TransOrdInfoMapperImpl extends TransOrdInfoMapper {
     )
     @ResultMap("com.easypay.cornucopiatrans.dal.dao.TransOrdInfoMapper.BaseResultMap")
     TransOrdInfo selectByOrderId(@Param("orderId") String orderId);
+
+
+    @Select({"select * from trans_ord_info",
+            "where user_Id = #{userId,jdbcType=VARCHAR} order by create_time desc limit 100"
+    }
+    )
+    @ResultMap("com.easypay.cornucopiatrans.dal.dao.TransOrdInfoMapper.BaseResultMap")
+    ArrayList<TransOrdInfo> selectOrderListByUserId(@Param("userId") String userId);
 
 }

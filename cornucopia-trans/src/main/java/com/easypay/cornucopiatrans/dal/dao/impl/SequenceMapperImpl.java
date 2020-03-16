@@ -17,7 +17,7 @@ public interface SequenceMapperImpl extends SequenceMapper {
             "from sequence",
             "where seq_name = #{seqName,jdbcType=VARCHAR}"
     })
-    @ResultMap("com.huifu.supay.louiscash.application.dal.mapper.SequenceMapper.BaseResultMap")
+    @ResultMap("com.easypay.cornucopiatrans.dal.dao.SequenceMapper.BaseResultMap")
     Sequence selectBySeqName(@Param("seqName") String seqName);
 
 

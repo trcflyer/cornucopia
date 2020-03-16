@@ -7,5 +7,5 @@ import lombok.Data;
 public class VoQuickPay extends BaseRequest {
     private String userId;
     private String amt;
-    private String cardSqrId;
+    private String cardSeqId;
 }

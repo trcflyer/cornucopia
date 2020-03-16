@@ -9,4 +9,21 @@
         where login_Id = #{loginId}
         and user_State = #{userState}
     </select>
+
+    <select id="selectByUniqueOpenId" resultMap="com.easypay.cornucopiatrans.dal.dao.UserLoginMapper.BaseResultMap"
+    >
+        select
+        <include refid="com.easypay.cornucopiatrans.dal.dao.UserLoginMapper.Base_Column_List" />
+        from user_login
+        where open_id = #{openId}
+        and user_State = #{userState}
+    </select>
+
+    <select id="selectByUserId" resultMap="com.easypay.cornucopiatrans.dal.dao.UserLoginMapper.BaseResultMap"
+    >
+        select
+        <include refid="com.easypay.cornucopiatrans.dal.dao.UserLoginMapper.Base_Column_List" />
+        from user_login
+        where user_Id = #{userId}
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.easypay.cornucopiatrans.interceptor;
 
+import com.easypay.cornucopiacommon.exception.BizException;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class RateLimiterIntercoptor  implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if(!tryAcquire()){
             log.warn("并发量太大");
-            throw new RuntimeException("系统繁忙，请稍后再试");
+            throw new BizException("系统繁忙，请稍后再试");
         }
         return true;
     }

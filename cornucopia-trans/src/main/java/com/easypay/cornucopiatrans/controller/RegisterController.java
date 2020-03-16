@@ -10,18 +10,19 @@ import com.easypay.cornucopiatrans.vo.response.ResultLogin;
 import com.easypay.cornucopiatrans.vo.response.ResultRegister;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@RestController("/trans")
+@RestController()
 public class RegisterController {
 
     @Autowired
     private RegisterServiceImpl registerService;
 
     @RequestMapping("/wechat/register")
-    public CommonResult register(VoRegister voRegister){
+    public CommonResult register(@Validated VoRegister voRegister){
         ResultRegister resultRegister = registerService.register( voRegister,"1");
         if (resultRegister == null){
             resultRegister.setRespCode(RespCode.CODE_002.getRespCode());

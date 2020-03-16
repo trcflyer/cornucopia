@@ -1,8 +1,8 @@
 package com.easypay.cornucopiatrans.vo;
 
 public class BaseResponse {
-    public String respCode;
-    public String respDesc;
+    private String respCode;
+    private String respDesc;
 
     public String getRespCode() {
         return respCode;

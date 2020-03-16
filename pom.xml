@@ -57,6 +57,5 @@
             cornucopia-trans
         </module>
         <module>cornucopia-common</module>
-        <module>cornucopia-query</module>
     </modules>
 </project>

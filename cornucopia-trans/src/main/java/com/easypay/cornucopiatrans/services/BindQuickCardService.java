@@ -4,6 +4,6 @@ import com.easypay.cornucopiatrans.vo.BaseResponse;
 
 public interface BindQuickCardService {
 
-    BaseResponse bindQuickCard(String userId, String cardNo, String bankId);
+    BaseResponse bindQuickCard(String userId);
 
 }

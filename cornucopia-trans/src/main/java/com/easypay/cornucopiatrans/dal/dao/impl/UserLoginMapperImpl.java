@@ -10,5 +10,9 @@ public interface UserLoginMapperImpl extends UserLoginMapper {
 
     UserLogin selectByLogin(@Param("loginId") String loginId,@Param("userState") String userState);
 
+    UserLogin selectByUniqueOpenId(@Param("openId") String openId,@Param("userState") String userState);
+
+    UserLogin selectByUserId(@Param("userId") String userId);
+
 
 }
