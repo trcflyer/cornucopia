@@ -1,0 +1,26 @@
+#数据源
+spring:
+  freemarker:
+    template-loader-path: classpath:/templates
+    suffix: .ftl
+    request-context-attribute: request
+    content-type: text/html
+    check-template-location: true
+    expose-request-attributes: true
+    expose-session-attributes: true
+    cache: false
+    charset: UTF-8
+  datasource:
+    url: jdbc:mysql://47.98.210.13:3306/test?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource #druid数据源
+mybatis:
+  configuration:
+    #开启驼峰
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:com/easypay/cornucopiaallqrpay/dal/**/*.xml #xml文件内容
+  type-aliases-package: com.easypay.cornucopiaallqrpay.dal.pojo #实体类包
+server:
+  port: 8082
