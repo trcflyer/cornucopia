@@ -214,12 +214,12 @@ public class PayOrderController {
             return errorMessage;
         }
 
-        String reqKey = mchInfo.getString("reqKey");
+        String reqKey = mchInfo.getString("reqkey");
         if (StringUtils.isBlank(reqKey)) {
             errorMessage = "reqKey is null[mchId="+mchId+"] record in db.";
             return errorMessage;
         }
-        payContext.put("resKey", mchInfo.getString("resKey"));
+        payContext.put("reskey", mchInfo.getString("reskey"));
 
         // 查询商户对应的支付渠道
         JSONObject payChannel = payChannelService.getByMchIdAndChannelId(mchId, channelId);
