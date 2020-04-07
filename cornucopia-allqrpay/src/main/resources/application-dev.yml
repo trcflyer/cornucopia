@@ -24,3 +24,11 @@ mybatis:
   type-aliases-package: com.easypay.cornucopiaallqrpay.dal.pojo #实体类包
 server:
   port: 8082
+
+config:
+  ali:
+    notify_url: http://api.xxpay.org/notify/pay/aliPayNotifyRes.htm
+    return_url: http://www.xxpay.org
+  wx:
+    certRootPath: C:\Users\trc\Desktop\HUEN\1582302321_20200406_cert
+    notifyUrl: http://api.xxpay.org/notify/pay/wxPayNotifyRes.htm

@@ -35,18 +35,18 @@ public class Notify4BasePay extends BaseService {
 	 * @return
 	 */
 	public String createNotifyUrl(TPayOrder payOrder, String backType) {
-		String mchId = payOrder.getMchid();
+		String mchId = payOrder.getMchId();
 		TMchInfo mchInfo = super.baseSelectMchInfo(mchId);
 		String resKey = mchInfo.getReskey();
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("payOrderId", payOrder.getPayorderid() == null ? "" : payOrder.getPayorderid());           // 支付订单号
-		paramMap.put("mchId", payOrder.getMchid() == null ? "" : payOrder.getMchid());                      	// 商户ID
-		paramMap.put("mchOrderNo", payOrder.getMchorderno() == null ? "" : payOrder.getMchorderno());       	// 商户订单号
-		paramMap.put("channelId", payOrder.getChannelid() == null ? "" : payOrder.getChannelid());              // 渠道ID
+		paramMap.put("payOrderId", payOrder.getPayOrderId() == null ? "" : payOrder.getPayOrderId());           // 支付订单号
+		paramMap.put("mchId", payOrder.getMchId() == null ? "" : payOrder.getMchId());                      	// 商户ID
+		paramMap.put("mchOrderNo", payOrder.getMchOrderNo() == null ? "" : payOrder.getMchOrderNo());       	// 商户订单号
+		paramMap.put("channelId", payOrder.getChannelId() == null ? "" : payOrder.getChannelId());              // 渠道ID
 		paramMap.put("amount", payOrder.getAmount() == null ? "" : payOrder.getAmount());                      	// 支付金额
 		paramMap.put("currency", payOrder.getCurrency() == null ? "" : payOrder.getCurrency());                 // 货币类型
 		paramMap.put("status", payOrder.getStatus() == null ? "" : payOrder.getStatus());               		// 支付状态
-		paramMap.put("clientIp", payOrder.getClientip()==null ? "" : payOrder.getClientip());   				// 客户端IP
+		paramMap.put("clientIp", payOrder.getClientIp()==null ? "" : payOrder.getClientIp());   				// 客户端IP
 		paramMap.put("device", payOrder.getDevice()==null ? "" : payOrder.getDevice());               			// 设备
 		paramMap.put("subject", payOrder.getSubject()==null ? "" : payOrder.getSubject());     	   				// 商品标题
 		paramMap.put("channelOrderNo", payOrder.getChannelorderno()==null ? "" : payOrder.getChannelorderno()); // 渠道订单号
@@ -69,7 +69,7 @@ public class Notify4BasePay extends BaseService {
 		}
 		String param = XXPayUtil.genUrlParams(paramMap);
 		StringBuffer sb = new StringBuffer();
-		sb.append(payOrder.getNotifyurl()).append("?").append(param);
+		sb.append(payOrder.getNotifyUrl()).append("?").append(param);
 		return sb.toString();
 	}
 
@@ -99,7 +99,7 @@ public class Notify4BasePay extends BaseService {
 		try {
 			log.info("汤仁才  处理异步结果通知TODO");
 		} catch (Exception e) {
-			log.error("payOrderId={},sendMessage error.", payOrder != null ? payOrder.getPayorderid() : "", e);
+			log.error("payOrderId={},sendMessage error.", payOrder != null ? payOrder.getPayOrderId() : "", e);
 		}
 		log.info(">>>>>> PAY回调通知业务系统完成 <<<<<<");
 	}
@@ -108,7 +108,7 @@ public class Notify4BasePay extends BaseService {
 		JSONObject object = new JSONObject();
 		object.put("method", "GET");
 		object.put("url", createNotifyUrl(payOrder, "2"));
-		object.put("orderId", payOrder.getPayorderid());
+		object.put("orderId", payOrder.getPayOrderId());
 		object.put("count", payOrder.getNotifycount());
 		object.put("createTime", System.currentTimeMillis());
 		return object;

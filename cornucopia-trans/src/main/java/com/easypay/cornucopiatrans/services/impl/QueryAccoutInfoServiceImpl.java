@@ -22,7 +22,7 @@ public class QueryAccoutInfoServiceImpl implements QueryAccoutInfoService {
 
         HuiFuResp huiFuResp = queryAccoutInfoBiz.queryAccoutInfo(userId);
         if(!RespCode.CODE_000.getRespCode().equals(huiFuResp.getRespCode())){
-            log.info("调用通道绑定快捷卡失败");
+            log.info("调用通道查询账号余额失败");
             resultQueryAcctInfo.setRespCode(RespCode.CODE_006.getRespCode());
             resultQueryAcctInfo.setRespDesc(RespCode.CODE_006.getRespDesc());
             return resultQueryAcctInfo;

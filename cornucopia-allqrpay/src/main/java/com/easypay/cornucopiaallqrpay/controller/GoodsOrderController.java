@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -42,21 +41,17 @@ public class GoodsOrderController {
     @Autowired
     private GoodsOrderService goodsOrderService;
 
-    static final String mchId = "20001223";
+    static final String MCHID = "20001223";
     // 加签key
     static final String reqKey = "M86l522AV6q613Ii4W6u8K48uW8vM1N6bFgyv769220MdYe9u37N4y7rI5mQ";
     // 验签key
     static final String resKey = "Hpcl522AV6q613KIi46u6g6XuW8vM1N8bFgyv769770MdYe9u37M4y7rIpl8";
     //static final String baseUrl = "http://api.xxpay.org/api";
-    static final String baseUrl = "http://127.0.0.1:8082/api";
-    //static final String notifyUrl = "http://shop.xxpay.org/goods/payNotify";
-    static final String notifyUrl = "http://127.0.0.1:8082/goods/payNotify";
+    static final String baseUrl = "http://127.0.0.1:8082";
     private AtomicLong seq = new AtomicLong(0L);
     private final static String QR_PAY_URL = "http://127.0.0.1:8082/goods/qrPay.html";
-    static final String AppID = "wx077cb62e341f8a5c";
-    static final String AppSecret = "e663ea068f3e4f952f143de1432a35c2";
-    private final static String GetOpenIdURL = "http://127.0.0.1:8082/goods/getOpenId";
-    private final static String GetOpenIdURL2 = "http://127.0.0.1:8082/goods/getOpenId2";
+    static final String AppID = "wx94099cff69f2c74e";
+    static final String AppSecret = "123";
 
 
     @RequestMapping(value = "/buy/{goodsId}", method = RequestMethod.GET)
@@ -88,7 +83,7 @@ public class GoodsOrderController {
             return "fail_001";
         }
         JSONObject paramMap = new JSONObject();
-        paramMap.put("mchId", mchId);                       // 商户ID
+        paramMap.put("mchId", MCHID);                       // 商户ID
         paramMap.put("mchOrderNo", goodsOrderId);           // 商户订单号
         paramMap.put("channelId", "ALIPAY_WAP");             // 支付渠道ID, WX_NATIVE,ALIPAY_WAP
         paramMap.put("amount", goodsOrder.getAmount());                          // 支付金额,单位分
@@ -97,7 +92,7 @@ public class GoodsOrderController {
         paramMap.put("device", "WEB");                      // 设备
         paramMap.put("subject", goodsOrder.getGoodsname());
         paramMap.put("body", goodsOrder.getGoodsname());
-        paramMap.put("notifyUrl", notifyUrl);         // 回调URL
+        paramMap.put("notifyUrl", baseUrl+"/goods/payNotify");         // 回调URL
         paramMap.put("param1", "");                         // 扩展参数1
         paramMap.put("param2", "");                         // 扩展参数2
         paramMap.put("extra", "{\"productId\":\"120989823\",\"openId\":\"o2RvowBf7sOVJf8kJksUEMceaDqo\"}");  // 附加参数
@@ -106,7 +101,7 @@ public class GoodsOrderController {
         paramMap.put("sign", reqSign);   // 签名
         String reqData = "params=" + paramMap.toJSONString();
         System.out.println("请求支付中心下单接口,请求数据:" + reqData);
-        String url = baseUrl + "/pay/create_order?";
+        String url = baseUrl + "/api/pay/create_order?";
         String result = XXPayUtil.call4Post(url + reqData);
         System.out.println("请求支付中心下单接口,响应数据:" + result);
         Map retMap = JSON.parseObject(result);
@@ -132,9 +127,9 @@ public class GoodsOrderController {
         return result+"";
     }
 
-    private Map createPayOrder(TGoodsOrder goodsOrder, Map<String, Object> params) {
+    private Map createPayOrder(TGoodsOrder goodsOrder, Map<String, Object> params,String mchId) {
         JSONObject paramMap = new JSONObject();
-        paramMap.put("mchId", mchId);                       // 商户ID
+        paramMap.put("mchId",mchId );                       // 商户ID
         paramMap.put("mchOrderNo", goodsOrder.getGoodsorderid());           // 商户订单号
         paramMap.put("channelId", params.get("channelId"));             // 支付渠道ID, WX_NATIVE,ALIPAY_WAP
         paramMap.put("amount", goodsOrder.getAmount());                          // 支付金额,单位分
@@ -143,7 +138,7 @@ public class GoodsOrderController {
         paramMap.put("device", "WEB");                      // 设备
         paramMap.put("subject", goodsOrder.getGoodsname());
         paramMap.put("body", goodsOrder.getGoodsname());
-        paramMap.put("notifyUrl", notifyUrl);         // 回调URL
+        paramMap.put("notifyUrl", baseUrl+"/goods/payNotify");         // 回调URL
         paramMap.put("param1", "");                         // 扩展参数1
         paramMap.put("param2", "");                         // 扩展参数2
 
@@ -155,7 +150,7 @@ public class GoodsOrderController {
         paramMap.put("sign", reqSign);   // 签名
         String reqData = "params=" + paramMap.toJSONString();
         System.out.println("请求支付中心下单接口,请求数据:" + reqData);
-        String url = baseUrl + "/pay/create_order?";
+        String url = baseUrl + "/api/pay/create_order?";
         String result = XXPayUtil.call4Post(url + reqData);
         System.out.println("请求支付中心下单接口,响应数据:" + result);
         Map retMap = JSON.parseObject(result);
@@ -167,27 +162,40 @@ public class GoodsOrderController {
                 System.out.println("=========支付中心下单验签成功=========");
             }else {
                 System.err.println("=========支付中心下单验签失败=========");
-                return null;
+                //return null;
             }
         }
         return retMap;
     }
 
     @RequestMapping("/openQrPay.html")
-    public String openQrPay(ModelMap model) {
+    public String openQrPay(ModelMap model,String mchId) {
+        if(StringUtils.isBlank(mchId)){
+            mchId = this.MCHID;
+        }
+        model.put("mchId", mchId);
         return "openQrPay";
+    }
+    @RequestMapping("/payOrder.html")
+    public String payOrder(ModelMap model,String mchId ) {
+        if(StringUtils.isBlank(mchId)){
+            mchId = this.MCHID;
+        }
+        model.put("mchId", mchId);
+        model.put("mchId", mchId);
+        return "payOrder";
     }
 
     @RequestMapping("/qrPay.html")
-    public String qrPay(ModelMap model, HttpServletRequest request, Long amount) {
+    public String qrPay(ModelMap model, HttpServletRequest request, Long payAmt,String mchId) {
         String logPrefix = "【二维码扫码支付】";
         String view = "qrPay";
         log.info("====== 开始接收二维码扫码支付请求 ======");
         String ua = request.getHeader("User-Agent");
         String goodsId = "G_0001";
-        log.info("{}接收参数:goodsId={},amount={},ua={}", logPrefix, goodsId, amount, ua);
-        String client = "alipay";
-        String channelId = "ALIPAY_WAP";
+        log.info("{}接收参数:goodsId={},amount={},ua={}", logPrefix, goodsId, payAmt, ua);
+        String client = "wx";
+        String channelId = "WX_JSAPI";
         if(StringUtils.isBlank(ua)) {
             String errorMessage = "User-Agent为空！";
             log.info("{}信息：{}", logPrefix, errorMessage);
@@ -218,8 +226,8 @@ public class GoodsOrderController {
             Map params = new HashMap<>();
             params.put("channelId", channelId);
             // 下单
-            goodsOrder = createGoodsOrder(goodsId, amount);
-            orderMap = createPayOrder(goodsOrder, params);
+            goodsOrder = createGoodsOrder(goodsId, payAmt);
+            orderMap = createPayOrder(goodsOrder, params,mchId);
         }else if("wx".equals(client)){
             log.info("{}{}扫码", logPrefix, "微信");
             // 判断是否拿到openid，如果没有则去获取
@@ -229,12 +237,12 @@ public class GoodsOrderController {
                 Map params = new HashMap<>();
                 params.put("channelId", channelId);
                 params.put("openId", openId);
-                goodsOrder = createGoodsOrder(goodsId, amount);
+                goodsOrder = createGoodsOrder(goodsId, payAmt);
                 // 下单
-                orderMap = createPayOrder(goodsOrder, params);
+                orderMap = createPayOrder(goodsOrder, params,mchId);
             }else {
-                String redirectUrl = QR_PAY_URL + "?amount=" + amount;
-                String url = GetOpenIdURL2 + "?redirectUrl=" + redirectUrl;
+                String redirectUrl = QR_PAY_URL + "?amount=" + payAmt;
+                String url = baseUrl+"/goods/getOpenId" + "?redirectUrl=" + redirectUrl;
                 log.info("跳转URL={}", url);
                 return "redirect:" + url;
             }
@@ -297,7 +305,7 @@ public class GoodsOrderController {
             }
             response.sendRedirect(redirectUrl);
         }else{//oauth获取code
-            String redirectUrl4Vx = GetOpenIdURL + "?redirectUrl=" + redirectUrl;
+            String redirectUrl4Vx = baseUrl+"/goods/getOpenId" + "?redirectUrl=" + redirectUrl;
             String state = OAuth2RequestParamHelper.prepareState(request);
             String url = WxApi.getOAuthCodeUrl(AppID, redirectUrl4Vx, "snsapi_base", state);
             log.info("跳转URL={}", url);
@@ -330,7 +338,7 @@ public class GoodsOrderController {
             response.sendRedirect(redirectUrl);
         }else{//oauth获取code
             //http://www.abc.com/xxx/get-weixin-code.html?appid=XXXX&scope=snsapi_base&state=hello-world&redirect_uri=http%3A%2F%2Fwww.xyz.com%2Fhello-world.html
-            String redirectUrl4Vx = GetOpenIdURL2 + "?redirectUrl=" + redirectUrl;
+            String redirectUrl4Vx = baseUrl+"/goods/getOpenId2" + "?redirectUrl=" + redirectUrl;
             String url = String.format("http://www.xiaoshuding.com/get-weixin-code.html?appid=%s&scope=snsapi_base&state=hello-world&redirect_uri=%s", AppID, WxApi.urlEnodeUTF8(redirectUrl4Vx));
             log.info("跳转URL={}", url);
             response.sendRedirect(url);
@@ -408,7 +416,7 @@ public class GoodsOrderController {
         params.put("channelId", channelId);
         // 下单
         TGoodsOrder goodsOrder = createGoodsOrder(goodsId, amount);
-        Map<String, String> orderMap = createPayOrder(goodsOrder, params);
+        Map<String, String> orderMap = createPayOrder(goodsOrder, params,MCHID);
         if(orderMap != null && "success".equalsIgnoreCase(orderMap.get("resCode"))) {
             String payOrderId = orderMap.get("payOrderId");
             TGoodsOrder go = new TGoodsOrder();
@@ -492,7 +500,7 @@ public class GoodsOrderController {
 
     public boolean verifySign(Map<String, Object> map) {
         String mchId = (String) map.get("mchId");
-        if(!this.mchId.equals(mchId)) return false;
+        if(!this.MCHID.equals(mchId)) return false;
         String localSign = PayDigestUtil.getSign(map, resKey, "sign");
         String sign = (String) map.get("sign");
         return localSign.equalsIgnoreCase(sign);

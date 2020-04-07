@@ -3,7 +3,7 @@
 <head>
     <meta charset="htf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>XXPAY支付中心</title>
+    <title>互恩智惠聚合支付</title>
     <style>
         body{font-family: 'Microsoft YaHei';}
         #amount,#error{height: 80px; line-height: 80px; text-align: center; color: #f00; font-size: 30px; font-weight: bold;}
@@ -23,7 +23,7 @@
     <table>
         <tr>
             <td>购买商品</td>
-            <td class="fr">${goodsOrder.goodsName}</td>
+            <td class="fr">${goodsOrder.goodsname}</td>
         </tr>
         <tr>
             <td>收款方</td>

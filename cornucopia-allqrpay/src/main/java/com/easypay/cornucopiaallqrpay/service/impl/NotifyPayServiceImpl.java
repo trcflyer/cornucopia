@@ -74,13 +74,13 @@ public class NotifyPayServiceImpl extends Notify4BasePay implements INotifyPaySe
             payOrder = (TPayOrder)payContext.get("payOrder");
             byte payStatus = payOrder.getStatus(); // 0：订单生成，1：支付中，-1：支付失败，2：支付成功，3：业务处理完成，-2：订单过期
             if (payStatus != PayConstant.PAY_STATUS_SUCCESS && payStatus != PayConstant.PAY_STATUS_COMPLETE) {
-                updatePayOrderRows = super.baseUpdateStatus4Success(payOrder.getPayorderid(), trade_no);
+                updatePayOrderRows = super.baseUpdateStatus4Success(payOrder.getPayOrderId(), trade_no);
                 if (updatePayOrderRows != 1) {
-                    log.error("{}更新支付状态失败,将payOrderId={},更新payStatus={}失败", logPrefix, payOrder.getPayorderid(), PayConstant.PAY_STATUS_SUCCESS);
+                    log.error("{}更新支付状态失败,将payOrderId={},更新payStatus={}失败", logPrefix, payOrder.getPayOrderId(), PayConstant.PAY_STATUS_SUCCESS);
                     log.info("{}响应给支付宝结果：{}", logPrefix, PayConstant.RETURN_ALIPAY_VALUE_FAIL);
                     return RpcUtil.createBizResult(baseParam, PayConstant.RETURN_ALIPAY_VALUE_FAIL);
                 }
-                log.info("{}更新支付状态成功,将payOrderId={},更新payStatus={}成功", logPrefix, payOrder.getPayorderid(), PayConstant.PAY_STATUS_SUCCESS);
+                log.info("{}更新支付状态成功,将payOrderId={},更新payStatus={}成功", logPrefix, payOrder.getPayOrderId(), PayConstant.PAY_STATUS_SUCCESS);
                 payOrder.setStatus(PayConstant.PAY_STATUS_SUCCESS);
                 payOrder.setChannelorderno(trade_no);
             }
@@ -129,12 +129,12 @@ public class NotifyPayServiceImpl extends Notify4BasePay implements INotifyPaySe
             // 处理订单
             byte payStatus = payOrder.getStatus(); // 0：订单生成，1：支付中，-1：支付失败，2：支付成功，3：业务处理完成，-2：订单过期
             if (payStatus != PayConstant.PAY_STATUS_SUCCESS && payStatus != PayConstant.PAY_STATUS_COMPLETE) {
-                int updatePayOrderRows = super.baseUpdateStatus4Success(payOrder.getPayorderid(), result.getTransactionId());
+                int updatePayOrderRows = super.baseUpdateStatus4Success(payOrder.getPayOrderId(), result.getTransactionId());
                 if (updatePayOrderRows != 1) {
-                    log.error("{}更新支付状态失败,将payOrderId={},更新payStatus={}失败", logPrefix, payOrder.getPayorderid(), PayConstant.PAY_STATUS_SUCCESS);
+                    log.error("{}更新支付状态失败,将payOrderId={},更新payStatus={}失败", logPrefix, payOrder.getPayOrderId(), PayConstant.PAY_STATUS_SUCCESS);
                     return RpcUtil.createBizResult(baseParam, WxPayNotifyResponse.fail("处理订单失败"));
                 }
-                log.error("{}更新支付状态成功,将payOrderId={},更新payStatus={}成功", logPrefix, payOrder.getPayorderid(), PayConstant.PAY_STATUS_SUCCESS);
+                log.error("{}更新支付状态成功,将payOrderId={},更新payStatus={}成功", logPrefix, payOrder.getPayOrderId(), PayConstant.PAY_STATUS_SUCCESS);
                 payOrder.setStatus(PayConstant.PAY_STATUS_SUCCESS);
                 payOrder.setChannelorderno(result.getTransactionId());
             }
@@ -208,8 +208,8 @@ public class NotifyPayServiceImpl extends Notify4BasePay implements INotifyPaySe
             return false;
         }
         // 查询payChannel记录
-        String mchId = payOrder.getMchid();
-        String channelId = payOrder.getChannelid();
+        String mchId = payOrder.getMchId();
+        String channelId = payOrder.getChannelId();
         TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
         if(payChannel == null) {
             log.error("Can't found payChannel form db. mchId={} channelId={}, ", payOrderId, mchId, channelId);
@@ -271,8 +271,8 @@ public class NotifyPayServiceImpl extends Notify4BasePay implements INotifyPaySe
         }
 
         // 查询payChannel记录
-        String mchId = payOrder.getMchid();
-        String channelId = payOrder.getChannelid();
+        String mchId = payOrder.getMchId();
+        String channelId = payOrder.getChannelId();
         TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
         if(payChannel == null) {
             log.error("Can't found payChannel form db. mchId={} channelId={}, ", payOrderId, mchId, channelId);

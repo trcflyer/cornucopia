@@ -54,8 +54,8 @@ public class BaseService {
     public TPayOrder baseSelectPayOrderByMchIdAndPayOrderId(String mchId, String payOrderId) {
         TPayOrderExample example = new TPayOrderExample();
         TPayOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andMchidEqualTo(mchId);
-        criteria.andPayorderidEqualTo(payOrderId);
+        criteria.andMchIdEqualTo(mchId);
+        criteria.andPayOrderIdEqualTo(payOrderId);
         List<TPayOrder> payOrderList = payOrderMapper.selectByExample(example);
         return CollectionUtils.isEmpty(payOrderList) ? null : payOrderList.get(0);
     }
@@ -63,8 +63,8 @@ public class BaseService {
     public TPayOrder baseSelectPayOrderByMchIdAndMchOrderNo(String mchId, String mchOrderNo) {
         TPayOrderExample example = new TPayOrderExample();
         TPayOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andMchidEqualTo(mchId);
-        criteria.andPayorderidEqualTo(mchOrderNo);
+        criteria.andMchIdEqualTo(mchId);
+        criteria.andPayOrderIdEqualTo(mchOrderNo);
         List<TPayOrder> payOrderList = payOrderMapper.selectByExample(example);
         return CollectionUtils.isEmpty(payOrderList) ? null : payOrderList.get(0);
     }
@@ -76,31 +76,31 @@ public class BaseService {
         payOrder.setPaysucctime(System.currentTimeMillis());
         TPayOrderExample example = new TPayOrderExample();
         TPayOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andPayorderidEqualTo(payOrderId);
+        criteria.andPayOrderIdEqualTo(payOrderId);
         criteria.andStatusEqualTo(PayConstant.PAY_STATUS_INIT);
         return payOrderMapper.updateByExampleSelective(payOrder, example);
     }
 
     public int baseUpdateStatus4Success(String payOrderId, String channelOrderNo) {
         TPayOrder payOrder = new TPayOrder();
-        payOrder.setPayorderid(payOrderId);
+        payOrder.setPayOrderId(payOrderId);
         payOrder.setStatus(PayConstant.PAY_STATUS_SUCCESS);
         if(channelOrderNo != null) payOrder.setChannelorderno(channelOrderNo);
         payOrder.setPaysucctime(System.currentTimeMillis());
         TPayOrderExample example = new TPayOrderExample();
         TPayOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andPayorderidEqualTo(payOrderId);
+        criteria.andPayOrderIdEqualTo(payOrderId);
         criteria.andStatusEqualTo(PayConstant.PAY_STATUS_PAYING);
         return payOrderMapper.updateByExampleSelective(payOrder, example);
     }
 
     public int baseUpdateStatus4Complete(String payOrderId) {
         TPayOrder payOrder = new TPayOrder();
-        payOrder.setPayorderid(payOrderId);
+        payOrder.setPayOrderId(payOrderId);
         payOrder.setStatus(PayConstant.PAY_STATUS_COMPLETE);
         TPayOrderExample example = new TPayOrderExample();
         TPayOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andPayorderidEqualTo(payOrderId);
+        criteria.andPayOrderIdEqualTo(payOrderId);
         criteria.andStatusEqualTo(PayConstant.PAY_STATUS_SUCCESS);
         return payOrderMapper.updateByExampleSelective(payOrder, example);
     }
@@ -109,7 +109,7 @@ public class BaseService {
         TPayOrder newPayOrder = new TPayOrder();
         newPayOrder.setNotifycount(count);
         newPayOrder.setLastnotifytime(System.currentTimeMillis());
-        newPayOrder.setPayorderid(payOrderId);
+        newPayOrder.setPayOrderId(payOrderId);
         return payOrderMapper.updateByPrimaryKeySelective(newPayOrder);
     }
 

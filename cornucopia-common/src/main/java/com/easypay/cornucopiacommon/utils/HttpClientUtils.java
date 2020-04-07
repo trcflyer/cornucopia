@@ -42,28 +42,28 @@ public class HttpClientUtils {
 
     @Value("${base_url}")
     String baseUrl ;
-
-    static {
-        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("http", PlainConnectionSocketFactory.INSTANCE)
-                .register("https", createSSLConnSocketFactory())
-                .build();
-        // 设置连接池
-        connMgr = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-        // 设置连接池大小
-        connMgr.setMaxTotal(100);
-        connMgr.setDefaultMaxPerRoute(connMgr.getMaxTotal());
-        RequestConfig.Builder configBuilder = RequestConfig.custom();
-        // 设置连接超时
-        configBuilder.setConnectTimeout(MAX_TIMEOUT);
-        // 设置读取超时
-        configBuilder.setSocketTimeout(MAX_TIMEOUT);
-        // 设置从连接池获取连接实例的超时
-        configBuilder.setConnectionRequestTimeout(MAX_TIMEOUT);
-        // 在提交请求之前 测试连接是否可用
-        configBuilder.setStaleConnectionCheckEnabled(true);
-        requestConfig = configBuilder.build();
-    }
+//
+//    static {
+//        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+//                .register("http", PlainConnectionSocketFactory.INSTANCE)
+//                .register("https", createSSLConnSocketFactory())
+//                .build();
+//        // 设置连接池
+//        connMgr = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+//        // 设置连接池大小
+//        connMgr.setMaxTotal(100);
+//        connMgr.setDefaultMaxPerRoute(connMgr.getMaxTotal());
+//        RequestConfig.Builder configBuilder = RequestConfig.custom();
+//        // 设置连接超时
+//        configBuilder.setConnectTimeout(MAX_TIMEOUT);
+//        // 设置读取超时
+//        configBuilder.setSocketTimeout(MAX_TIMEOUT);
+//        // 设置从连接池获取连接实例的超时
+//        configBuilder.setConnectionRequestTimeout(MAX_TIMEOUT);
+//        // 在提交请求之前 测试连接是否可用
+//        configBuilder.setStaleConnectionCheckEnabled(true);
+//        requestConfig = configBuilder.build();
+//    }
 
 
     /**
@@ -75,6 +75,7 @@ public class HttpClientUtils {
      */
     public  JSONObject doPost(String url, Map<String,String> paramsMap) {
         url = baseUrl+url;
+        log.info("调用通道请求地址：{}",url);
         log.info("调用通道请求参数：{}",paramsMap);
         CloseableHttpClient httpclient = HttpClients.custom().setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
         HttpPost httpPost = new HttpPost(url);
@@ -108,37 +109,37 @@ public class HttpClientUtils {
         log.info("调用通道应答结果：{}",jsonObject);
         return jsonObject;
     }
-
-    /**
-     * 创建SSL安全连接
-     *
-     * @return
-     */
-    private static SSLConnectionSocketFactory createSSLConnSocketFactory() {
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContext ctx = SSLContext.getInstance("SSL");
-            X509TrustManager tm = new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {
-                }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            };
-            ctx.init(null, new TrustManager[]{tm}, null);
-            sslsf = new SSLConnectionSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        }
-        return sslsf;
-    }
+//
+//    /**
+//     * 创建SSL安全连接
+//     *
+//     * @return
+//     */
+//    private static SSLConnectionSocketFactory createSSLConnSocketFactory() {
+//        SSLConnectionSocketFactory sslsf = null;
+//        try {
+//            SSLContext ctx = SSLContext.getInstance("SSL");
+//            X509TrustManager tm = new X509TrustManager() {
+//                @Override
+//                public void checkClientTrusted(X509Certificate[] chain,
+//                                               String authType) throws CertificateException {
+//                }
+//
+//                @Override
+//                public void checkServerTrusted(X509Certificate[] chain,
+//                                               String authType) throws CertificateException {
+//                }
+//
+//                @Override
+//                public X509Certificate[] getAcceptedIssuers() {
+//                    return null;
+//                }
+//            };
+//            ctx.init(null, new TrustManager[]{tm}, null);
+//            sslsf = new SSLConnectionSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+//        } catch (GeneralSecurityException e) {
+//            e.printStackTrace();
+//        }
+//        return sslsf;
+//    }
 }

@@ -61,14 +61,14 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
                 log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
                 return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
             }
-            String mchId = payOrder.getMchid();
-            String channelId = payOrder.getChannelid();
+            String mchId = payOrder.getMchId();
+            String channelId = payOrder.getChannelId();
             TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
             WxPayConfig wxPayConfig = WxPayUtil.getWxPayConfig(payChannel.getParam(), tradeType, wxPayProperties.getCertRootPath(), wxPayProperties.getNotifyUrl());
             WxPayService wxPayService = new WxPayServiceImpl();
             wxPayService.setConfig(wxPayConfig);
             WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = buildUnifiedOrderRequest(payOrder, wxPayConfig);
-            String payOrderId = payOrder.getPayorderid();
+            String payOrderId = payOrder.getPayOrderId();
             WxPayUnifiedOrderResult wxPayUnifiedOrderResult;
             try {
                 wxPayUnifiedOrderResult = wxPayService.unifiedOrder(wxPayUnifiedOrderRequest);
@@ -157,7 +157,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
      */
     WxPayUnifiedOrderRequest buildUnifiedOrderRequest(TPayOrder payOrder, WxPayConfig wxPayConfig) {
         String tradeType = wxPayConfig.getTradeType();
-        String payOrderId = payOrder.getPayorderid();
+        String payOrderId = payOrder.getPayOrderId();
         Integer totalFee = payOrder.getAmount().intValue();// 支付金额,单位分
         String deviceInfo = payOrder.getDevice();
         String body = payOrder.getBody();
@@ -165,7 +165,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
         String attach = null;
         String outTradeNo = payOrderId;
         String feeType = "CNY";
-        String spBillCreateIP = payOrder.getClientip();
+        String spBillCreateIP = payOrder.getClientIp();
         String timeStart = null;
         String timeExpire = null;
         String goodsTag = null;

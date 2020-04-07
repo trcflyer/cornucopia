@@ -58,9 +58,9 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
             log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
             return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
         }
-        String payOrderId = payOrder.getPayorderid();
-        String mchId = payOrder.getMchid();
-        String channelId = payOrder.getChannelid();
+        String payOrderId = payOrder.getPayOrderId();
+        String mchId = payOrder.getMchId();
+        String channelId = payOrder.getChannelId();
         TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
         alipayConfig.init(payChannel.getParam());
         AlipayClient client = new DefaultAlipayClient(alipayConfig.getUrl(), alipayConfig.getApp_id(), alipayConfig.getRsa_private_key(), AlipayConfig.FORMAT, AlipayConfig.CHARSET, alipayConfig.getAlipay_public_key(), AlipayConfig.SIGNTYPE);
@@ -120,9 +120,9 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
             log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
             return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
         }
-        String payOrderId = payOrder.getPayorderid();
-        String mchId = payOrder.getMchid();
-        String channelId = payOrder.getChannelid();
+        String payOrderId = payOrder.getPayOrderId();
+        String mchId = payOrder.getMchId();
+        String channelId = payOrder.getChannelId();
         TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
         alipayConfig.init(payChannel.getParam());
         AlipayClient client = new DefaultAlipayClient(alipayConfig.getUrl(), alipayConfig.getApp_id(), alipayConfig.getRsa_private_key(), AlipayConfig.FORMAT, AlipayConfig.CHARSET, alipayConfig.getAlipay_public_key(), AlipayConfig.SIGNTYPE);
@@ -185,9 +185,9 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
             log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
             return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
         }
-        String payOrderId = payOrder.getPayorderid();
-        String mchId = payOrder.getMchid();
-        String channelId = payOrder.getChannelid();
+        String payOrderId = payOrder.getPayOrderId();
+        String mchId = payOrder.getMchId();
+        String channelId = payOrder.getChannelId();
         TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
         alipayConfig.init(payChannel.getParam());
         AlipayClient client = new DefaultAlipayClient(alipayConfig.getUrl(), alipayConfig.getApp_id(), alipayConfig.getRsa_private_key(), AlipayConfig.FORMAT, AlipayConfig.CHARSET, alipayConfig.getAlipay_public_key(), AlipayConfig.SIGNTYPE);
@@ -234,9 +234,9 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
             log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
             return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
         }
-        String payOrderId = payOrder.getPayorderid();
-        String mchId = payOrder.getMchid();
-        String channelId = payOrder.getChannelid();
+        String payOrderId = payOrder.getPayOrderId();
+        String mchId = payOrder.getMchId();
+        String channelId = payOrder.getChannelId();
         TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
         alipayConfig.init(payChannel.getParam());
         AlipayClient client = new DefaultAlipayClient(alipayConfig.getUrl(), alipayConfig.getApp_id(), alipayConfig.getRsa_private_key(), AlipayConfig.FORMAT, AlipayConfig.CHARSET, alipayConfig.getAlipay_public_key(), AlipayConfig.SIGNTYPE);
