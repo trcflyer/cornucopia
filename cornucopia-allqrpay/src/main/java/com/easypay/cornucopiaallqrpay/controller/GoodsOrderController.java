@@ -232,6 +232,7 @@ public class GoodsOrderController {
             log.info("{}{}扫码", logPrefix, "微信");
             // 判断是否拿到openid，如果没有则去获取
             String openId = request.getParameter("openId");
+            openId="weioruiweoruio093248xmvweio";
             if (StringUtils.isNotBlank(openId)) {
                 log.info("{}openId：{}", logPrefix, openId);
                 Map params = new HashMap<>();
@@ -241,7 +242,7 @@ public class GoodsOrderController {
                 // 下单
                 orderMap = createPayOrder(goodsOrder, params,mchId);
             }else {
-                String redirectUrl = QR_PAY_URL + "?amount=" + payAmt;
+                String redirectUrl = QR_PAY_URL + "?payAmt=" + payAmt+"&mchId="+mchId;
                 String url = baseUrl+"/goods/getOpenId" + "?redirectUrl=" + redirectUrl;
                 log.info("跳转URL={}", url);
                 return "redirect:" + url;
