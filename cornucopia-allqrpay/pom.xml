@@ -79,6 +79,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
+            <scope>true</scope>
+            <optional>true</optional>
         </dependency>
 
         <!--MyBatis分页插件-->
@@ -119,6 +121,7 @@
     </dependencies>
 
     <build>
+        <finalName>allqrpay</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

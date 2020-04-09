@@ -51,7 +51,7 @@ public class GoodsOrderController {
     private AtomicLong seq = new AtomicLong(0L);
     private final static String QR_PAY_URL = "http://127.0.0.1:8082/goods/qrPay.html";
     static final String AppID = "wx94099cff69f2c74e";
-    static final String AppSecret = "123";
+    static final String AppSecret = "0efb27b66c84c449858cfe5d09d5f73c";
 
 
     @RequestMapping(value = "/buy/{goodsId}", method = RequestMethod.GET)
@@ -232,7 +232,6 @@ public class GoodsOrderController {
             log.info("{}{}扫码", logPrefix, "微信");
             // 判断是否拿到openid，如果没有则去获取
             String openId = request.getParameter("openId");
-            openId="weioruiweoruio093248xmvweio";
             if (StringUtils.isNotBlank(openId)) {
                 log.info("{}openId：{}", logPrefix, openId);
                 Map params = new HashMap<>();
