@@ -1,5 +1,7 @@
 package com.easypay.cornucopiacommon.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
@@ -16,9 +18,9 @@ import java.util.Map;
  * @version V1.0
  * @Copyright: www.xxpay.org
  */
+@Slf4j
 public class PayDigestUtil {
 
-	private static final MyLog _log = MyLog.getLog(PayDigestUtil.class);
 	private static String encodingCharset = "UTF-8";
 	
 	/**
@@ -155,9 +157,9 @@ public class PayDigestUtil {
 		}
 		String result = sb.toString();
 		result += "key=" + key;
-		_log.debug("Sign Before MD5:" + result);
+		log.debug("Sign Before MD5:" + result);
 		result = md5(result, encodingCharset).toUpperCase();
-		_log.debug("Sign Result:" + result);
+		log.debug("Sign Result:" + result);
 		return result;
 	}
 
@@ -177,9 +179,9 @@ public class PayDigestUtil {
 		}
 		String result = sb.toString();
 		result += "key=" + key;
-		_log.debug("Sign Before MD5:" + result);
+		log.debug("Sign Before MD5:" + result);
 		result = md5(result, encodingCharset).toUpperCase();
-		_log.debug("Sign Result:" + result);
+		log.debug("Sign Result:" + result);
 		return result;
 	}
 

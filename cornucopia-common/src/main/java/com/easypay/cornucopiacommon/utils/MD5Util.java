@@ -1,10 +1,13 @@
 package com.easypay.cornucopiacommon.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.security.MessageDigest;
 
 /**
  * 采用MD5加密解密
  */
+@Slf4j
 public class MD5Util {
 
     /**
@@ -17,8 +20,7 @@ public class MD5Util {
         try{
             md5 = MessageDigest.getInstance("MD5");
         }catch (Exception e){
-            System.out.println(e.toString());
-            e.printStackTrace();
+           log.error(e.getMessage());
             return "";
         }
         char[] charArray = inStr.toCharArray();

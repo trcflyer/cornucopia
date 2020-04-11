@@ -53,7 +53,6 @@
     </build>
 
     <modules>
-        <module>cornucopia-trans</module>
         <module>cornucopia-allqrpay</module>
         <module>cornucopia-common</module>
     </modules>

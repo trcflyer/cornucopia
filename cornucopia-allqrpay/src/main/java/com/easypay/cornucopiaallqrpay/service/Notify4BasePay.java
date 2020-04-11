@@ -8,6 +8,7 @@ import com.easypay.cornucopiacommon.utils.PayDigestUtil;
 import com.easypay.cornucopiacommon.utils.XXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 
@@ -28,6 +29,9 @@ import java.util.Map;
 public class Notify4BasePay extends BaseService {
 
 
+	@Value("${myrsa.publickey}")
+	String publickey;
+
 	/**
 	 * 创建响应URL
 	 * @param payOrder
@@ -37,7 +41,6 @@ public class Notify4BasePay extends BaseService {
 	public String createNotifyUrl(TPayOrder payOrder, String backType) {
 		String mchId = payOrder.getMchId();
 		TMchInfo mchInfo = super.baseSelectMchInfo(mchId);
-		String resKey = mchInfo.getReskey();
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("payOrderId", payOrder.getPayOrderId() == null ? "" : payOrder.getPayOrderId());           // 支付订单号
 		paramMap.put("mchId", payOrder.getMchId() == null ? "" : payOrder.getMchId());                      	// 商户ID
@@ -55,7 +58,7 @@ public class Notify4BasePay extends BaseService {
 		paramMap.put("paySuccTime", payOrder.getPaysucctime()==null ? "" : payOrder.getPaysucctime());			// 支付成功时间
 		paramMap.put("backType", backType==null ? "" : backType);
 		// 先对原文签名
-		String reqSign = PayDigestUtil.getSign(paramMap, resKey);
+		String reqSign = PayDigestUtil.getSign(paramMap, publickey);
 		paramMap.put("sign", reqSign);   // 签名
 		// 签名后再对有中文参数编码
 		try {

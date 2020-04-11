@@ -30,7 +30,7 @@ public class BaseService {
 
 
     public TMchInfo baseSelectMchInfo(String mchId) {
-        return mchInfoMapper.selectByPrimaryKey(mchId);
+        return mchInfoMapper.selectByMchId(mchId);
     }
 
     public TPayChannel baseSelectPayChannel(String mchId, String channelId) {
