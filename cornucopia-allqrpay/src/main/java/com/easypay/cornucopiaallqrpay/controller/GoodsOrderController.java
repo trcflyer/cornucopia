@@ -3,6 +3,8 @@ package com.easypay.cornucopiaallqrpay.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.easypay.cornucopiaallqrpay.biz.CheckMerIdBiz;
+import com.easypay.cornucopiaallqrpay.biz.SequenceBiz;
+import com.easypay.cornucopiaallqrpay.dal.dao.SequenceMapper;
 import com.easypay.cornucopiaallqrpay.dal.dao.impl.TMchInfoMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TGoodsOrder;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TMchInfo;
@@ -61,7 +63,12 @@ public class GoodsOrderController {
     @Autowired
     private RSAEncryptUtil rsaEncryptUtil;
 
-    private AtomicLong seq = new AtomicLong(0L);
+    @Autowired
+    private EncryptUtil encryptUtil;
+
+    @Autowired
+    private SequenceBiz sequenceBiz;
+
     static final String AppID = "wx94099cff69f2c74e";
     static final String AppSecret = "0efb27b66c84c449858cfe5d09d5f73c";
 
@@ -126,16 +133,12 @@ public class GoodsOrderController {
         }
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
-        HashMap map = new HashMap(1);
-        map.put("mchId",mchId);
-        map.put("key",tMchInfo.getRandomKey());
         try {
-            String reqSign = rsaEncryptUtil.sign(map,privatekey);
+            model.put("baseUrl", defaultRequestValue.getBaseUrl());
+            model.put("value", encryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText());
             model.put("mchId", mchId);
-            model.put("key", tMchInfo.getRandomKey());
-            model.put("checkValue", reqSign);
         }catch (Exception e){
-            log.info("延签异常");
+            log.info("验签异常");
             return "error";
         }
         return "createQrPay";
@@ -148,8 +151,8 @@ public class GoodsOrderController {
      * @return
      */
     @RequestMapping("/payOrder.html")
-    public String payOrder(ModelMap model,String mchId,String key,String checkValue ) {
-        if (StringUtils.isBlank(mchId)||StringUtils.isBlank(key)||StringUtils.isBlank(checkValue)){
+    public String payOrder(ModelMap model,String mchId,String value ) {
+        if (StringUtils.isBlank(mchId)||StringUtils.isBlank(value)){
             return "error";
         }
 
@@ -160,21 +163,23 @@ public class GoodsOrderController {
         }
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
-        HashMap map = new HashMap(1);
-        map.put("mchId",mchId);
-        map.put("key",key);
+
         try {
-            boolean checkRestlt = rsaEncryptUtil.verify(map,publickey,checkValue);
-            if(!tMchInfo.getRandomKey().equals(key) || !checkRestlt){
+            String checkRestlt = encryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText();
+            if(!value.equals(checkRestlt)){
                 log.info("验签失败");
                 return "error";
             }
+            HashMap map = new HashMap(2);
+            map.put("mchId",mchId);
+            map.put("key",RandomStrUtils.getInstance().getRandomString());
+
             model.put("mchId", mchId);
-            model.put("key", RandomStrUtils.getInstance().getRandomString());
-            model.put("checkValue", rsaEncryptUtil.sign(map,privatekey));
+            model.put("key", map.get("key"));
+            model.put("checkValue", encryptUtil.encrypt(rsaEncryptUtil.sign(map,privatekey)).getCipherText());
 
         }catch (Exception e){
-            log.info("延签异常");
+            log.info("验签异常");
             return "error";
         }
 
@@ -195,18 +200,17 @@ public class GoodsOrderController {
             return "error";
         }
 
-        TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
-        HashMap map = new HashMap(1);
+        HashMap map = new HashMap(2);
         map.put("mchId",mchId);
         map.put("key",key);
         try {
-            boolean checkRestlt = rsaEncryptUtil.verify(map,publickey,checkValue);
-            if(checkRestlt){
+            boolean checkRestlt = rsaEncryptUtil.verify(map,publickey,encryptUtil.decrypt(checkValue).getPlainText());
+            if(!checkRestlt){
                 log.info("验签失败");
                 return "error";
             }
         }catch (Exception e){
-            log.info("延签异常");
+            log.info("验签异常");
             return "error";
         }
 
@@ -247,7 +251,7 @@ public class GoodsOrderController {
             Map params = new HashMap<>();
             params.put("channelId", channelId);
             // 下单
-            goodsOrder = createGoodsOrder(goodsId, payAmt);
+            goodsOrder = createGoodsOrder(goodsId, payAmt,mchId);
             orderMap = createPayOrder(goodsOrder, params,mchId);
         }else if("wx".equals(client)){
             log.info("{}{}扫码", logPrefix, "微信");
@@ -258,7 +262,7 @@ public class GoodsOrderController {
                 Map params = new HashMap<>();
                 params.put("channelId", channelId);
                 params.put("openId", openId);
-                goodsOrder = createGoodsOrder(goodsId, payAmt);
+                goodsOrder = createGoodsOrder(goodsId, payAmt,mchId);
                 // 下单
                 orderMap = createPayOrder(goodsOrder, params,mchId);
             }else {
@@ -284,18 +288,19 @@ public class GoodsOrderController {
         return view;
     }
 
-    TGoodsOrder createGoodsOrder(String goodsId, Long amount) {
+    TGoodsOrder createGoodsOrder(String goodsId, Long amount,String mchId) {
         if(null == amount){
             amount = 1L;
         }
+        String ordIdSqe = sequenceBiz.getSeqId("ORD_ID_SQE");
         // 先插入订单数据
-        String goodsOrderId =  String.format("%s%s%06d", "G", DateUtil.getSeqString(), (int) seq.getAndIncrement() % 1000000);
+        String goodsOrderId =  String.format("%s%s%06d", "G", DateUtil.getSeqString(), ordIdSqe);
         TGoodsOrder goodsOrder = new TGoodsOrder();
         goodsOrder.setGoodsorderid(goodsOrderId);
         goodsOrder.setGoodsid(goodsId);
         goodsOrder.setGoodsname("聚合扫码支付");
         goodsOrder.setAmount(amount);
-        goodsOrder.setUserid("xxpay_000001");
+        goodsOrder.setUserid(mchId);
         goodsOrder.setStatus(Constant.GOODS_ORDER_STATUS_INIT);
         int result = goodsOrderService.addGoodsOrder(goodsOrder);
         log.info("插入商品订单,返回:{}", result);
@@ -404,7 +409,7 @@ public class GoodsOrderController {
         Map params = new HashMap<>();
         params.put("channelId", channelId);
         // 下单
-        TGoodsOrder goodsOrder = createGoodsOrder(goodsId, amount);
+        TGoodsOrder goodsOrder = createGoodsOrder(goodsId, amount,mchId);
         Map<String, String> orderMap = createPayOrder(goodsOrder, params,mchId);
         if(orderMap != null && "success".equalsIgnoreCase(orderMap.get("resCode"))) {
             String payOrderId = orderMap.get("payOrderId");

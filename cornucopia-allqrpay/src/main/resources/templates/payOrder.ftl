@@ -23,6 +23,8 @@
 <form action="/goods/qrPay.html" method="post">
     支付金额: <input type="text" name="payAmt" />
     <input type="hidden" name="mchId" value="${mchId}" />
+    <input type="hidden" name="key" value="${key}" />
+    <input type="hidden" name="checkValue" value="${checkValue}" />
     <br><br>
     <input type="submit" value="Submit" />
 </form>
