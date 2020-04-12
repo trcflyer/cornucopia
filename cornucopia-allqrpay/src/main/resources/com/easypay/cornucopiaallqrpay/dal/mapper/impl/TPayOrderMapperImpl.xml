@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.easypay.cornucopiaallqrpay.dal.dao.impl.TPayOrderMapperImpl" >
+    <select id="selectByPayOrderId" resultMap="com.easypay.cornucopiaallqrpay.dal.dao.TPayOrderMapper.BaseResultMap"
+    >
+        select
+        <include refid="com.easypay.cornucopiaallqrpay.dal.dao.TPayOrderMapper.Base_Column_List" />
+        from t_pay_order
+        where Pay_Order_Id = #{payOrderId}
+    </select>
+</mapper>

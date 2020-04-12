@@ -20,13 +20,13 @@
 </head>
 <body>
 <div style="width:100%;text-align:center">
-<form action="/goods/qrPay.html" method="post">
-    支付金额: <input type="text" name="payAmt" />
+<form action="/allqrpay/goods/qrPay.html" method="post">
+    支付金额: <input type="text" name="payAmt" />元
     <input type="hidden" name="mchId" value="${mchId}" />
     <input type="hidden" name="key" value="${key}" />
     <input type="hidden" name="checkValue" value="${checkValue}" />
     <br><br>
-    <input type="submit" value="Submit" />
+    <input type="submit" value="确认支付" />
 </form>
 </div>
 </body>

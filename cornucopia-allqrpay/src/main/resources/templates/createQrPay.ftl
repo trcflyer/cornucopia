@@ -59,7 +59,7 @@
         var baseUrl = '${baseUrl}';
         var value = '${value}';
         var mchId = ${mchId};
-        var qrText = baseUrl+"goods/payOrder.html?mchId=" + mchId+"&value="+value;
+        var qrText = baseUrl+"/goods/payOrder.html?mchId=" + mchId+"&value="+value;
         qrcode.makeCode(qrText);
     }
 

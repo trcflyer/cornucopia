@@ -1,8 +1,5 @@
 package com.easypay.cornucopiacommon.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.net.ssl.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -35,7 +32,6 @@ public class HttpClient {
 
     private static final String JKS_CA_PASSWORD = "";
 
-    private static Logger _log = LoggerFactory.getLogger(HttpClient.class);
 
     /**
      * ca证书文件
@@ -162,7 +158,6 @@ public class HttpClient {
         try {
             this.doResponse();
         } catch (IOException e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
             //return "";
         }
@@ -221,10 +216,8 @@ public class HttpClient {
                 this.callHttp();
                 isRet = true;
             } catch (IOException e) {
-                _log.error("", e);
                 this.errInfo = e.getMessage();
             } catch (Exception e) {
-                _log.error("", e);
                 this.errInfo = e.getMessage();
             }
             return isRet;
@@ -244,25 +237,18 @@ public class HttpClient {
             this.callHttps();
             isRet = true;
         } catch (UnrecoverableKeyException e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
         } catch (KeyManagementException e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
         } catch (CertificateException e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
         } catch (KeyStoreException e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
         } catch (NoSuchAlgorithmException e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
         } catch (IOException e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
         } catch (Exception e) {
-            _log.error("", e);
             this.errInfo = e.getMessage();
         }
         return isRet;

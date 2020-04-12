@@ -1,4 +1,4 @@
-package com.easypay.cornucopiacommon;
+package com.easypay.cornucopiaallqrpay;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

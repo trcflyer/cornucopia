@@ -26,7 +26,7 @@ public class GoodsOrderService {
     }
 
     public TGoodsOrder getGoodsOrder(String goodsOrderId) {
-        return goodsOrderMapper.selectByPrimaryKey(goodsOrderId);
+        return goodsOrderMapper.selectByGoodsOrderId(goodsOrderId);
     }
 
     public int updateStatus4Success(String goodsOrderId) {
@@ -34,7 +34,7 @@ public class GoodsOrderService {
         goodsOrder.setStatus(Constant.GOODS_ORDER_STATUS_SUCCESS);
         TGoodsOrderExample example = new TGoodsOrderExample();
         TGoodsOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsorderidEqualTo(goodsOrderId);
+        criteria.andGoodsOrderIdEqualTo(goodsOrderId);
         criteria.andStatusEqualTo(Constant.GOODS_ORDER_STATUS_INIT);
         return goodsOrderMapper.updateByExampleSelective(goodsOrder, example);
     }
@@ -44,7 +44,7 @@ public class GoodsOrderService {
         goodsOrder.setStatus(Constant.GOODS_ORDER_STATUS_COMPLETE);
         TGoodsOrderExample example = new TGoodsOrderExample();
         TGoodsOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsorderidEqualTo(goodsOrderId);
+        criteria.andGoodsOrderIdEqualTo(goodsOrderId);
         criteria.andStatusEqualTo(Constant.GOODS_ORDER_STATUS_SUCCESS);
         return goodsOrderMapper.updateByExampleSelective(goodsOrder, example);
     }
@@ -54,7 +54,7 @@ public class GoodsOrderService {
         goodsOrder.setStatus(Constant.GOODS_ORDER_STATUS_FAIL);
         TGoodsOrderExample example = new TGoodsOrderExample();
         TGoodsOrderExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsorderidEqualTo(goodsOrderId);
+        criteria.andGoodsOrderIdEqualTo(goodsOrderId);
         //criteria.andStatusEqualTo(Constant.GOODS_ORDER_STATUS_SUCCESS);
         return goodsOrderMapper.updateByExampleSelective(goodsOrder, example);
     }

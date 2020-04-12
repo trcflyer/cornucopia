@@ -4,13 +4,10 @@ import cn.hutool.core.util.HexUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.DES;
 import com.easypay.cornucopiacommon.bean.EncryptResult;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 /**
  * 加密机实现加解密
  */
-@Service
 public class EncryptUtil {
 
     private final static String KEY = "02ecfed591a83bce";
@@ -20,7 +17,7 @@ public class EncryptUtil {
      * @param content
      * @return
      */
-    public EncryptResult encrypt(String content){
+    public static EncryptResult encrypt(String content){
         EncryptResult result = new EncryptResult();
         result.setPlainText(content);
 
@@ -40,7 +37,7 @@ public class EncryptUtil {
      * @param content
      * @return
      */
-    public EncryptResult decrypt(String content){
+    public static EncryptResult decrypt(String content){
         EncryptResult result = new EncryptResult();
         result.setCipherText(content);
         DES des = SecureUtil.des(HexUtil.decodeHex(KEY));

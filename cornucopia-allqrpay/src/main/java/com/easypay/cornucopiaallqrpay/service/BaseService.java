@@ -48,7 +48,7 @@ public class BaseService {
     }
 
     public TPayOrder baseSelectPayOrder(String payOrderId) {
-        return payOrderMapper.selectByPrimaryKey(payOrderId);
+        return payOrderMapper.selectByPayOrderId(payOrderId);
     }
 
     public TPayOrder baseSelectPayOrderByMchIdAndPayOrderId(String mchId, String payOrderId) {

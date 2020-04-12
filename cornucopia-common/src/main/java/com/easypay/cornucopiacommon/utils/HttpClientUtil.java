@@ -1,7 +1,5 @@
 package com.easypay.cornucopiacommon.utils;
 
-import org.slf4j.LoggerFactory;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -31,8 +29,6 @@ public class HttpClientUtil {
 	public static final String TLS = "TLS";
 	
 	private static final String encoding = "UTF-8";
-	
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 	
 	/**
 	 * get HttpURLConnection

@@ -3,7 +3,6 @@ package com.easypay.cornucopiacommon.utils;
 import com.alibaba.fastjson.JSON;
 import com.easypay.cornucopiacommon.constant.PayConstant;
 import com.easypay.cornucopiacommon.constant.PayEnum;
-import lombok.extern.slf4j.Slf4j;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,7 +17,6 @@ import java.util.Set;
  * @version V1.0
  * @Copyright: www.xxpay.org
  */
-@Slf4j
 public class XXPayUtil {
 
     public static Map<String, Object> makeRetMap(String retCode, String retMsg, String resCode, String errCode, String errCodeDesc) {
@@ -48,12 +46,10 @@ public class XXPayUtil {
             String sign = PayDigestUtil.getSign(retMap, resKey, "payParams");
             retMap.put(PayConstant.RESULT_PARAM_SIGN, sign);
         }
-        log.info("生成响应数据:{}", retMap);
         return JSON.toJSONString(retMap);
     }
 
     public static String makeRetFail(Map retMap) {
-        log.info("生成响应数据:{}", retMap);
         return JSON.toJSONString(retMap);
     }
 

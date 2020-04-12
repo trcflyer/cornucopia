@@ -2,9 +2,9 @@ package com.easypay.cornucopiaallqrpay.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.easypay.cornucopiaallqrpay.DefaultRequestValue;
 import com.easypay.cornucopiaallqrpay.biz.CheckMerIdBiz;
 import com.easypay.cornucopiaallqrpay.biz.SequenceBiz;
-import com.easypay.cornucopiaallqrpay.dal.dao.SequenceMapper;
 import com.easypay.cornucopiaallqrpay.dal.dao.impl.TMchInfoMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TGoodsOrder;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TMchInfo;
@@ -14,7 +14,6 @@ import com.easypay.cornucopiaallqrpay.util.DateUtil;
 import com.easypay.cornucopiaallqrpay.util.OAuth2RequestParamHelper;
 import com.easypay.cornucopiaallqrpay.util.vx.WxApi;
 import com.easypay.cornucopiaallqrpay.util.vx.WxApiClient;
-import com.easypay.cornucopiacommon.DefaultRequestValue;
 import com.easypay.cornucopiacommon.constant.PayConstant;
 import com.easypay.cornucopiacommon.enums.RespCode;
 import com.easypay.cornucopiacommon.utils.*;
@@ -32,9 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Controller
@@ -61,23 +60,15 @@ public class GoodsOrderController {
     private CheckMerIdBiz checkMerIdBiz;
 
     @Autowired
-    private RSAEncryptUtil rsaEncryptUtil;
-
-    @Autowired
-    private EncryptUtil encryptUtil;
-
-    @Autowired
     private SequenceBiz sequenceBiz;
 
     static final String AppID = "wx94099cff69f2c74e";
     static final String AppSecret = "0efb27b66c84c449858cfe5d09d5f73c";
 
     private Map createPayOrder(TGoodsOrder goodsOrder, Map<String, Object> params,String mchId) {
-        TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
-
-        JSONObject paramMap = new JSONObject();
+        HashMap<String,Object> paramMap = new HashMap<String,Object>();
         paramMap.put("mchId",mchId );                       // 商户ID
-        paramMap.put("mchOrderNo", goodsOrder.getGoodsorderid());           // 商户订单号
+        paramMap.put("mchOrderNo", goodsOrder.getGoodsOrderId());           // 商户订单号
         paramMap.put("channelId", params.get("channelId"));             // 支付渠道ID, WX_NATIVE,ALIPAY_WAP
         paramMap.put("amount", goodsOrder.getAmount());                          // 支付金额,单位分
         paramMap.put("currency", "cny");                    // 币种, cny-人民币
@@ -92,10 +83,15 @@ public class GoodsOrderController {
         JSONObject extra = new JSONObject();
         extra.put("openId", params.get("openId"));
         paramMap.put("extra", extra.toJSONString());  // 附加参数
+        try {
+            String reqSign = EncryptUtil.encrypt(RSAEncryptUtil.sign(paramMap,privatekey)).getCipherText();
+            paramMap.put("sign", reqSign);   // 签名
+        }catch (Exception e){
+            log.info("签名异常",e.getMessage());
+            return null;
+        }
 
-        String reqSign = PayDigestUtil.getSign(paramMap, privatekey);
-        paramMap.put("sign", reqSign);   // 签名
-        String reqData = "params=" + paramMap.toJSONString();
+        String reqData = "params=" + JSONObject.toJSONString(paramMap);
         log.info("请求支付中心下单接口,请求数据:" + reqData);
         String url = defaultRequestValue.getBaseUrl() + "/api/pay/create_order?";
         String result = XXPayUtil.call4Post(url + reqData);
@@ -124,21 +120,24 @@ public class GoodsOrderController {
     @RequestMapping("/createQrPay.html")
     public String openQrPay(ModelMap model,String mchId) {
         if (StringUtils.isBlank(mchId)){
+            model.put("errorMessage","请求参数错误");
             return "error";
         }
         RespCode respCode = checkMerIdBiz.checkMer(mchId);
         if(!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())){
             log.info(respCode.getRespDesc());
+            model.put("errorMessage","商户号不合法");
             return "error";
         }
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
         try {
             model.put("baseUrl", defaultRequestValue.getBaseUrl());
-            model.put("value", encryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText());
+            model.put("value", EncryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText());
             model.put("mchId", mchId);
         }catch (Exception e){
-            log.info("验签异常");
+            log.info("签名异常");
+            model.put("errorMessage","系统异常");
             return "error";
         }
         return "createQrPay";
@@ -153,21 +152,24 @@ public class GoodsOrderController {
     @RequestMapping("/payOrder.html")
     public String payOrder(ModelMap model,String mchId,String value ) {
         if (StringUtils.isBlank(mchId)||StringUtils.isBlank(value)){
+             model.put("errorMessage","请求参数错误");
             return "error";
         }
 
         RespCode respCode = checkMerIdBiz.checkMer(mchId);
         if(!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())){
             log.info(respCode.getRespDesc());
+            model.put("errorMessage","商户号不合法");
             return "error";
         }
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
 
         try {
-            String checkRestlt = encryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText();
+            String checkRestlt = EncryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText();
             if(!value.equals(checkRestlt)){
                 log.info("验签失败");
+                model.put("errorMessage","数据不合法");
                 return "error";
             }
             HashMap map = new HashMap(2);
@@ -176,10 +178,11 @@ public class GoodsOrderController {
 
             model.put("mchId", mchId);
             model.put("key", map.get("key"));
-            model.put("checkValue", encryptUtil.encrypt(rsaEncryptUtil.sign(map,privatekey)).getCipherText());
+            model.put("checkValue", EncryptUtil.encrypt(RSAEncryptUtil.sign(map,privatekey)).getCipherText());
 
         }catch (Exception e){
             log.info("验签异常");
+            model.put("errorMessage","系统异常");
             return "error";
         }
 
@@ -189,11 +192,16 @@ public class GoodsOrderController {
     }
 
     @RequestMapping("/qrPay.html")
-    public String qrPay(ModelMap model, HttpServletRequest request, Long payAmt,String mchId,String key,String checkValue) {
+    public String qrPay(ModelMap model, HttpServletRequest request, String payAmt,String mchId,String key,String checkValue) {
         String logPrefix = "【二维码扫码支付】";
-        if (StringUtils.isBlank(mchId)||StringUtils.isBlank(key)||StringUtils.isBlank(checkValue)){
+        if (StringUtils.isBlank(mchId)||StringUtils.isBlank(payAmt)||StringUtils.isBlank(key)||StringUtils.isBlank(checkValue)){
+            model.put("errorMessage","请求参数错误");
             return "error";
         }
+        BigDecimal ordAmtBigDecimal = new BigDecimal(payAmt);
+        ordAmtBigDecimal = ordAmtBigDecimal.multiply(new BigDecimal(100));
+        ordAmtBigDecimal = ordAmtBigDecimal.setScale(0,BigDecimal.ROUND_HALF_UP);
+        Long ordAmt = ordAmtBigDecimal.longValue();
         RespCode respCode = checkMerIdBiz.checkMer(mchId);
         if(!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())){
             log.info(respCode.getRespDesc());
@@ -204,23 +212,25 @@ public class GoodsOrderController {
         map.put("mchId",mchId);
         map.put("key",key);
         try {
-            boolean checkRestlt = rsaEncryptUtil.verify(map,publickey,encryptUtil.decrypt(checkValue).getPlainText());
+            boolean checkRestlt = RSAEncryptUtil.verify(map,publickey,EncryptUtil.decrypt(checkValue).getPlainText());
             if(!checkRestlt){
                 log.info("验签失败");
+                model.put("errorMessage","数据不合法");
                 return "error";
             }
         }catch (Exception e){
             log.info("验签异常");
+            model.put("errorMessage","系统异常");
             return "error";
         }
 
         String view = "qrPay";
         log.info("====== 开始接收二维码扫码支付请求 ======");
         String ua = request.getHeader("User-Agent");
-        String goodsId = "G_0001";
+        String goodsId = "10001";
         log.info("{}接收参数:goodsId={},amount={},ua={}", logPrefix, goodsId, payAmt, ua);
-        String client = "wx";
-        String channelId = "WX_JSAPI";
+        String client = "alipay";
+        String channelId = "ALIPAY_WAP";
         if(StringUtils.isBlank(ua)) {
             String errorMessage = "User-Agent为空！";
             log.info("{}信息：{}", logPrefix, errorMessage);
@@ -251,7 +261,7 @@ public class GoodsOrderController {
             Map params = new HashMap<>();
             params.put("channelId", channelId);
             // 下单
-            goodsOrder = createGoodsOrder(goodsId, payAmt,mchId);
+            goodsOrder = createGoodsOrder(goodsId, ordAmt,mchId);
             orderMap = createPayOrder(goodsOrder, params,mchId);
         }else if("wx".equals(client)){
             log.info("{}{}扫码", logPrefix, "微信");
@@ -262,11 +272,11 @@ public class GoodsOrderController {
                 Map params = new HashMap<>();
                 params.put("channelId", channelId);
                 params.put("openId", openId);
-                goodsOrder = createGoodsOrder(goodsId, payAmt,mchId);
+                goodsOrder = createGoodsOrder(goodsId, ordAmt,mchId);
                 // 下单
                 orderMap = createPayOrder(goodsOrder, params,mchId);
             }else {
-                String redirectUrl = defaultRequestValue.getBaseUrl()+"/goods/qrPay.html?payAmt=" + payAmt+"&mchId="+mchId;
+                String redirectUrl = defaultRequestValue.getBaseUrl()+"/goods/qrPay.html?ordAmt=" + payAmt+"&mchId="+mchId;
                 String url = defaultRequestValue.getBaseUrl()+"/goods/getOpenId" + "?redirectUrl=" + redirectUrl;
                 log.info("跳转URL={}", url);
                 return "redirect:" + url;
@@ -278,8 +288,8 @@ public class GoodsOrderController {
             model.put("orderMap", orderMap);
             String payOrderId = orderMap.get("payOrderId");
             TGoodsOrder go = new TGoodsOrder();
-            go.setGoodsorderid(goodsOrder.getGoodsorderid());
-            go.setPayorderid(payOrderId);
+            go.setGoodsOrderId(goodsOrder.getGoodsOrderId());
+            go.setPayOrderId(payOrderId);
             go.setChannelid(channelId);
             int ret = goodsOrderService.update(go);
             log.info("修改商品订单,返回:{}", ret);
@@ -294,9 +304,9 @@ public class GoodsOrderController {
         }
         String ordIdSqe = sequenceBiz.getSeqId("ORD_ID_SQE");
         // 先插入订单数据
-        String goodsOrderId =  String.format("%s%s%06d", "G", DateUtil.getSeqString(), ordIdSqe);
+        String goodsOrderId =  StringUtils.leftPad(ordIdSqe,20,"0");
         TGoodsOrder goodsOrder = new TGoodsOrder();
-        goodsOrder.setGoodsorderid(goodsOrderId);
+        goodsOrder.setGoodsOrderId(goodsOrderId);
         goodsOrder.setGoodsid(goodsId);
         goodsOrder.setGoodsname("聚合扫码支付");
         goodsOrder.setAmount(amount);
@@ -414,8 +424,8 @@ public class GoodsOrderController {
         if(orderMap != null && "success".equalsIgnoreCase(orderMap.get("resCode"))) {
             String payOrderId = orderMap.get("payOrderId");
             TGoodsOrder go = new TGoodsOrder();
-            go.setGoodsorderid(goodsOrder.getGoodsorderid());
-            go.setPayorderid(payOrderId);
+            go.setGoodsOrderId(goodsOrder.getGoodsOrderId());
+            go.setPayOrderId(payOrderId);
             go.setChannelid(channelId);
             int ret = goodsOrderService.update(go);
             log.info("修改商品订单,返回:{}", ret);

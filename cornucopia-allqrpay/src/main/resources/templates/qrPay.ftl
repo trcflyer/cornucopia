@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <meta charset="htf-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>互恩智惠聚合支付</title>
     <style>
@@ -27,7 +27,7 @@
         </tr>
         <tr>
             <td>收款方</td>
-            <td class="fr">北京骏易科技有限公司</td>
+            <td class="fr">上海互恩新媒体科技有限公司</td>
         </tr>
     </table>
 </div>

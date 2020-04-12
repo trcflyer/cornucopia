@@ -2,16 +2,19 @@ package com.easypay.cornucopiaallqrpay.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.easypay.cornucopiaallqrpay.biz.SequenceBiz;
 import com.easypay.cornucopiaallqrpay.service.IMchInfoService;
 import com.easypay.cornucopiaallqrpay.service.IPayChannelService;
 import com.easypay.cornucopiaallqrpay.service.IPayOrderService;
 import com.easypay.cornucopiacommon.constant.PayConstant;
-import com.easypay.cornucopiacommon.utils.MySeq;
+import com.easypay.cornucopiacommon.utils.EncryptUtil;
+import com.easypay.cornucopiacommon.utils.RSAEncryptUtil;
 import com.easypay.cornucopiacommon.utils.XXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +41,15 @@ public class PayOrderController {
 
     @Autowired
     private IMchInfoService mchInfoService;
+
+    @Value("${myrsa.publickey}")
+    String publickey;
+
+    @Value("${myrsa.privatekey}")
+    String privatekey;
+
+    @Autowired
+    private SequenceBiz sequenceBiz;
 
     /**
      * 统一下单接口:
@@ -203,24 +215,6 @@ public class PayOrderController {
             return errorMessage;
         }
 
-        // 查询商户信息
-        JSONObject mchInfo = mchInfoService.getByMchId(mchId);
-        if(mchInfo == null) {
-            errorMessage = "Can't found mchInfo[mchId="+mchId+"] record in db.";
-            return errorMessage;
-        }
-        if(mchInfo.getByte("state") != 1) {
-            errorMessage = "mchInfo not available [mchId="+mchId+"] record in db.";
-            return errorMessage;
-        }
-
-        String reqKey = mchInfo.getString("reqkey");
-        if (StringUtils.isBlank(reqKey)) {
-            errorMessage = "reqKey is null[mchId="+mchId+"] record in db.";
-            return errorMessage;
-        }
-        payContext.put("reskey", mchInfo.getString("reskey"));
-
         // 查询商户对应的支付渠道
         JSONObject payChannel = payChannelService.getByMchIdAndChannelId(mchId, channelId);
         if(payChannel == null) {
@@ -232,15 +226,24 @@ public class PayOrderController {
             return errorMessage;
         }
 
+        params.remove("sign");
         // 验证签名数据
-        boolean verifyFlag = XXPayUtil.verifyPaySign(params, reqKey);
-        if(!verifyFlag) {
-            errorMessage = "Verify XX pay sign failed.";
-            return errorMessage;
+        try {
+            boolean checkRestlt = RSAEncryptUtil.verify(params,publickey, EncryptUtil.decrypt(sign).getPlainText());
+            if(!checkRestlt){
+                log.info("验签失败");
+                errorMessage = "Verify XX pay sign failed.";
+                return errorMessage;
+            }
+        }catch (Exception e){
+            log.info("验签异常");
         }
         // 验证参数通过,返回JSONObject对象
         JSONObject payOrder = new JSONObject();
-        payOrder.put("payOrderId", MySeq.getPay());
+        // 先插入订单数据
+        String ordIdSqe = sequenceBiz.getSeqId("PAY_ID_SQE");
+        ordIdSqe =  StringUtils.leftPad(ordIdSqe,20,"0");
+        payOrder.put("payOrderId", ordIdSqe);
         payOrder.put("mchId", mchId);
         payOrder.put("mchOrderNo", mchOrderNo);
         payOrder.put("channelId", channelId);
