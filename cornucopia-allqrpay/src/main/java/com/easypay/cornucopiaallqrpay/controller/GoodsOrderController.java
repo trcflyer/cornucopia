@@ -1,5 +1,6 @@
 package com.easypay.cornucopiaallqrpay.controller;
 
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.easypay.cornucopiaallqrpay.DefaultRequestValue;
@@ -91,10 +92,14 @@ public class GoodsOrderController {
             return null;
         }
 
-        String reqData = "params=" + JSONObject.toJSONString(paramMap);
-        log.info("请求支付中心下单接口,请求数据:" + reqData);
+        //String reqData = "params=" + JSONObject.toJSONString(paramMap);
+        JSONObject requestJSONObject = new JSONObject();
+        requestJSONObject.put("params",JSONObject.toJSONString(paramMap));
+        log.info("请求支付中心下单接口,请求数据:" + JSONObject.toJSONString(paramMap));
         String url = defaultRequestValue.getBaseUrl() + "/api/pay/create_order?";
-        String result = XXPayUtil.call4Post(url + reqData);
+        //String result = XXPayUtil.call4Post(url + reqData);
+        String result = HttpUtil.post(url,JSONObject.toJSONString(paramMap));
+
         log.info("请求支付中心下单接口,响应数据:" + result);
         Map retMap = JSON.parseObject(result);
         if("SUCCESS".equals(retMap.get("retCode"))) {
@@ -198,10 +203,8 @@ public class GoodsOrderController {
             model.put("errorMessage","请求参数错误");
             return "error";
         }
-        BigDecimal ordAmtBigDecimal = new BigDecimal(payAmt);
-        ordAmtBigDecimal = ordAmtBigDecimal.multiply(new BigDecimal(100));
-        ordAmtBigDecimal = ordAmtBigDecimal.setScale(0,BigDecimal.ROUND_HALF_UP);
-        Long ordAmt = ordAmtBigDecimal.longValue();
+
+        String ordAmt = AmountUtil.convertDollar2Cent(payAmt);
         RespCode respCode = checkMerIdBiz.checkMer(mchId);
         if(!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())){
             log.info(respCode.getRespDesc());
@@ -229,8 +232,8 @@ public class GoodsOrderController {
         String ua = request.getHeader("User-Agent");
         String goodsId = "10001";
         log.info("{}接收参数:goodsId={},amount={},ua={}", logPrefix, goodsId, payAmt, ua);
-        String client = "alipay";
-        String channelId = "ALIPAY_WAP";
+        String client = "wx";
+        String channelId = "WX_JSAPI";
         if(StringUtils.isBlank(ua)) {
             String errorMessage = "User-Agent为空！";
             log.info("{}信息：{}", logPrefix, errorMessage);
@@ -261,18 +264,19 @@ public class GoodsOrderController {
             Map params = new HashMap<>();
             params.put("channelId", channelId);
             // 下单
-            goodsOrder = createGoodsOrder(goodsId, ordAmt,mchId);
+            goodsOrder = createGoodsOrder(goodsId, Long.valueOf(ordAmt),mchId);
             orderMap = createPayOrder(goodsOrder, params,mchId);
         }else if("wx".equals(client)){
             log.info("{}{}扫码", logPrefix, "微信");
             // 判断是否拿到openid，如果没有则去获取
             String openId = request.getParameter("openId");
+            openId = "oP74lwuq0mzh19MZ9KLmr456ApoA";
             if (StringUtils.isNotBlank(openId)) {
                 log.info("{}openId：{}", logPrefix, openId);
                 Map params = new HashMap<>();
                 params.put("channelId", channelId);
                 params.put("openId", openId);
-                goodsOrder = createGoodsOrder(goodsId, ordAmt,mchId);
+                goodsOrder = createGoodsOrder(goodsId, Long.valueOf(ordAmt),mchId);
                 // 下单
                 orderMap = createPayOrder(goodsOrder, params,mchId);
             }else {
@@ -308,7 +312,7 @@ public class GoodsOrderController {
         TGoodsOrder goodsOrder = new TGoodsOrder();
         goodsOrder.setGoodsOrderId(goodsOrderId);
         goodsOrder.setGoodsid(goodsId);
-        goodsOrder.setGoodsname("聚合扫码支付");
+        goodsOrder.setGoodsname("扫码支付");
         goodsOrder.setAmount(amount);
         goodsOrder.setUserid(mchId);
         goodsOrder.setStatus(Constant.GOODS_ORDER_STATUS_INIT);

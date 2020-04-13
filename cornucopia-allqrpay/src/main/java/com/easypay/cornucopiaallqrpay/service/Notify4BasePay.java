@@ -7,7 +7,6 @@ import com.easypay.cornucopiacommon.constant.PayConstant;
 import com.easypay.cornucopiacommon.utils.PayDigestUtil;
 import com.easypay.cornucopiacommon.utils.XXPayUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
