@@ -26,11 +26,11 @@ mybatis:
 
 config:
   ali:
-    notify_url: http://www.hoteonpay.com/notify/pay/aliPayNotifyRes.htm
-    return_url: http://www.hoteonpay.com
+    notify_url: http://www.hoteonpay.com/allqrpay/notify/pay/aliPayNotifyRes.htm
+    return_url: http://www.hoteonpay.com/allqrpay/payFinish.htm
   wx:
     certRootPath: D:\\huen
-    notifyUrl: http://www.hoteonpay.com/notify/pay/wxPayNotifyRes.htm
+    notifyUrl: http://www.hoteonpay.com/allqrpay/notify/pay/wxPayNotifyRes.htm
 myrsa:
   publickey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCNhKIYSGR9k7GDWz0NiDHBv2yoRBdYcMFVXpZG0d6XsuYUHCAnRpJC/jdOWDQYzWlKP4ZF+qFKHWyu8ihjEdIoMNBUlSnSS3VUedz+pHHnrxX+Tr5a9+cCMKgXMnHWyZo4Xc0QprLTicngH6vLtGvLSwkXuhrNwx/sfa5MzweJEwIDAQAB
   privatekey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAI2EohhIZH2TsYNbPQ2IMcG/bKhEF1hwwVVelkbR3pey5hQcICdGkkL+N05YNBjNaUo/hkX6oUodbK7yKGMR0igw0FSVKdJLdVR53P6kceevFf5Ovlr35wIwqBcycdbJmjhdzRCmstOJyeAfq8u0a8tLCRe6Gs3DH+x9rkzPB4kTAgMBAAECgYAni11kHa5+7KtYwkEALAODWUM6jbRcUT2k5kZlybVCfIoQKn/Nmcm7EKBRsxHzsEpwpemWWl+Bf1FkXWRtsogfqJn63FU6lhZmnsIqEssf6816v/LumH8C9rcWndt1R0YibJ7ob/VXWtLh7R+AoJKoYB01XQdg2QGvBSL4XGN/gQJBAOZowPbVruq/7aEIRx64JOOP6Z4Wi3XkZ4iTfB1DaPVNL7wIBrJF/CyjfZn2HZYeqM6tF7LAV7gk+hsBM5k568ECQQCdPG44Sy2+8THSZ03z1igTLNu0gRSrr/61hxce02/YljRrAj0ezI1T+e9HN4kvNksj60698ENnskv+h50K3HnTAkBStB8vepwCn0nIl5QPrsFu/WU53ZXJh2ayW14dkujFxCLyN19P9lcCHt0iunj8PZ0SModjHi9eZcdwkgnXYjcBAkAee/LakyjBVj3Ujxa76Y9HeHD4I/Z/+tUlGJXQ8ilDEowDGyICcKIN3+0WH5xHPP2Ab0SK6qQG3LiDFoPJ8UjlAkEApS6i1YCsfGb/B32FbfQ1282Gd6b8zEQVXkL05gL9TZp5xMROO4C/6GvEKhXilHyQCKc3p9KD4XdOKX1SoNpOfw==

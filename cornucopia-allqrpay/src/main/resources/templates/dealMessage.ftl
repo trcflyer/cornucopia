@@ -12,6 +12,6 @@
 </head>
 
 <body>
-<div><h4 >${errorMessage}</h4></div>
+<div><h4 >${dealMessage}</h4></div>
 </body>
 </html>

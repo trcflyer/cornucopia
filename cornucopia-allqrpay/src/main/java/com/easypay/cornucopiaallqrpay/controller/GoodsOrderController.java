@@ -125,14 +125,14 @@ public class GoodsOrderController {
     @RequestMapping("/createQrPay.html")
     public String openQrPay(ModelMap model,String mchId) {
         if (StringUtils.isBlank(mchId)){
-            model.put("errorMessage","请求参数错误");
-            return "error";
+            model.put("dealMessage","请求参数错误");
+            return "dealMessage";
         }
         RespCode respCode = checkMerIdBiz.checkMer(mchId);
         if(!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())){
             log.info(respCode.getRespDesc());
-            model.put("errorMessage","商户号不合法");
-            return "error";
+            model.put("dealMessage","商户号不合法");
+            return "dealMessage";
         }
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
@@ -142,8 +142,8 @@ public class GoodsOrderController {
             model.put("mchId", mchId);
         }catch (Exception e){
             log.info("签名异常");
-            model.put("errorMessage","系统异常");
-            return "error";
+            model.put("dealMessage","系统异常");
+            return "dealMessage";
         }
         return "createQrPay";
     }
@@ -157,15 +157,15 @@ public class GoodsOrderController {
     @RequestMapping("/payOrder.html")
     public String payOrder(ModelMap model,String mchId,String value ) {
         if (StringUtils.isBlank(mchId)||StringUtils.isBlank(value)){
-             model.put("errorMessage","请求参数错误");
-            return "error";
+             model.put("dealMessage","请求参数错误");
+            return "dealMessage";
         }
 
         RespCode respCode = checkMerIdBiz.checkMer(mchId);
         if(!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())){
             log.info(respCode.getRespDesc());
-            model.put("errorMessage","商户号不合法");
-            return "error";
+            model.put("dealMessage","商户号不合法");
+            return "dealMessage";
         }
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
@@ -174,8 +174,8 @@ public class GoodsOrderController {
             String checkRestlt = EncryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText();
             if(!value.equals(checkRestlt)){
                 log.info("验签失败");
-                model.put("errorMessage","数据不合法");
-                return "error";
+                model.put("dealMessage","数据不合法");
+                return "dealMessage";
             }
             HashMap map = new HashMap(2);
             map.put("mchId",mchId);
@@ -187,8 +187,8 @@ public class GoodsOrderController {
 
         }catch (Exception e){
             log.info("验签异常");
-            model.put("errorMessage","系统异常");
-            return "error";
+            model.put("dealMessage","系统异常");
+            return "dealMessage";
         }
 
 
@@ -200,15 +200,16 @@ public class GoodsOrderController {
     public String qrPay(ModelMap model, HttpServletRequest request, String payAmt,String mchId,String key,String checkValue) {
         String logPrefix = "【二维码扫码支付】";
         if (StringUtils.isBlank(mchId)||StringUtils.isBlank(payAmt)||StringUtils.isBlank(key)||StringUtils.isBlank(checkValue)){
-            model.put("errorMessage","请求参数错误");
-            return "error";
+            model.put("dealMessage","请求参数错误");
+            return "dealMessage";
         }
 
         String ordAmt = AmountUtil.convertDollar2Cent(payAmt);
         RespCode respCode = checkMerIdBiz.checkMer(mchId);
         if(!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())){
             log.info(respCode.getRespDesc());
-            return "error";
+            model.put("dealMessage","输入金额错误");
+            return "dealMessage";
         }
 
         HashMap map = new HashMap(2);
@@ -218,13 +219,13 @@ public class GoodsOrderController {
             boolean checkRestlt = RSAEncryptUtil.verify(map,publickey,EncryptUtil.decrypt(checkValue).getPlainText());
             if(!checkRestlt){
                 log.info("验签失败");
-                model.put("errorMessage","数据不合法");
-                return "error";
+                model.put("dealMessage","数据不合法");
+                return "dealMessage";
             }
         }catch (Exception e){
             log.info("验签异常");
-            model.put("errorMessage","系统异常");
-            return "error";
+            model.put("dealMessage","系统异常");
+            return "dealMessage";
         }
 
         String view = "qrPay";
@@ -270,7 +271,8 @@ public class GoodsOrderController {
             log.info("{}{}扫码", logPrefix, "微信");
             // 判断是否拿到openid，如果没有则去获取
             String openId = request.getParameter("openId");
-            openId = "oP74lwuq0mzh19MZ9KLmr456ApoA";
+            //openId = "oP74lwuq0mzh19MZ9KLmr456ApoA";
+            log.info("用户opedId={}",openId);
             if (StringUtils.isNotBlank(openId)) {
                 log.info("{}openId：{}", logPrefix, openId);
                 Map params = new HashMap<>();
