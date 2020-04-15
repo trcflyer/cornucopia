@@ -3,7 +3,6 @@ package com.easypay.cornucopiaallqrpay.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,9 +19,8 @@ public class PayFinishController {
      * @throws ServletException
      * @throws IOException
      */
-    @RequestMapping("/notify/pay/payFinish.htm")
-    @ResponseBody
-    public String wxPayNotifyRes(HttpServletRequest request) throws ServletException, IOException {
+    @RequestMapping("/payFinish.htm")
+    public String wxPayNotifyRes(HttpServletRequest request)  {
         return "payFinish";
     }
 }

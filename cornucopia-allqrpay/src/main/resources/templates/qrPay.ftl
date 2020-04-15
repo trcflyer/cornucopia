@@ -22,12 +22,12 @@
 <div id="info">
     <table>
         <tr>
-            <td>购买商品</td>
-            <td class="fr">${goodsOrder.goodsname}</td>
+            <td>支付类型</td>
+            <td class="fr">扫码支付</td>
         </tr>
         <tr>
             <td>收款方</td>
-            <td class="fr">上海互恩新媒体科技有限公司</td>
+            <td class="fr">${mchName}</td>
         </tr>
     </table>
 </div>

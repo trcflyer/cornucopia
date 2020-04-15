@@ -82,6 +82,7 @@ public class BaseService {
     }
 
     public int baseUpdateStatus4Success(String payOrderId, String channelOrderNo) {
+
         TPayOrder payOrder = new TPayOrder();
         payOrder.setPayOrderId(payOrderId);
         payOrder.setStatus(PayConstant.PAY_STATUS_SUCCESS);

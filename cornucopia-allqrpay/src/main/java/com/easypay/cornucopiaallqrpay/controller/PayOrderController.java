@@ -7,6 +7,7 @@ import com.easypay.cornucopiaallqrpay.service.IMchInfoService;
 import com.easypay.cornucopiaallqrpay.service.IPayChannelService;
 import com.easypay.cornucopiaallqrpay.service.IPayOrderService;
 import com.easypay.cornucopiacommon.constant.PayConstant;
+import com.easypay.cornucopiacommon.utils.DateUtils;
 import com.easypay.cornucopiacommon.utils.EncryptUtil;
 import com.easypay.cornucopiacommon.utils.RSAEncryptUtil;
 import com.easypay.cornucopiacommon.utils.XXPayUtil;
@@ -39,14 +40,11 @@ public class PayOrderController {
     @Autowired
     private IPayChannelService payChannelService;
 
-    @Autowired
-    private IMchInfoService mchInfoService;
-
     @Value("${myrsa.publickey}")
-    String publickey;
+    String mypublickey;
 
     @Value("${myrsa.privatekey}")
-    String privatekey;
+    String myprivatekey;
 
     @Autowired
     private SequenceBiz sequenceBiz;
@@ -229,7 +227,7 @@ public class PayOrderController {
         params.remove("sign");
         // 验证签名数据
         try {
-            boolean checkRestlt = RSAEncryptUtil.verify(params,publickey, EncryptUtil.decrypt(sign).getPlainText());
+            boolean checkRestlt = RSAEncryptUtil.verify(params,mypublickey, EncryptUtil.decrypt(sign).getPlainText());
             if(!checkRestlt){
                 log.info("验签失败");
                 errorMessage = "Verify XX pay sign failed.";
@@ -241,9 +239,11 @@ public class PayOrderController {
         // 验证参数通过,返回JSONObject对象
         JSONObject payOrder = new JSONObject();
         // 先插入订单数据
-        String ordIdSqe = sequenceBiz.getSeqId("PAY_ID_SQE");
-        ordIdSqe =  StringUtils.leftPad(ordIdSqe,20,"0");
-        payOrder.put("payOrderId", ordIdSqe);
+        String ordIdSqe  = sequenceBiz.getSeqId("PAY_ID_SQE");
+        ordIdSqe =  StringUtils.leftPad(ordIdSqe,8,"0");
+        payOrder.put("transDate", DateUtils.getCurrentTimeStrDefault().substring(0,8));
+        payOrder.put("sqeId", ordIdSqe);
+        payOrder.put("payOrderId", payOrder.get("transDate")+ordIdSqe);
         payOrder.put("mchId", mchId);
         payOrder.put("mchOrderNo", mchOrderNo);
         payOrder.put("channelId", channelId);
