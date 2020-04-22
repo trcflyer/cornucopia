@@ -1,9 +1,19 @@
+<#assign base = request.contextPath />
 <!DOCTYPE HTML>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>互恩智惠聚合支付</title>
+    <title>互恩智惠</title>
+    <!-- Bootstrap core CSS -->
+    <link href="//cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${base}/css/main.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="${base}/logo.svg">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
     <style>
         body{font-family: 'Microsoft YaHei';}
         #amount,#error{height: 80px; line-height: 80px; text-align: center; color: #f00; font-size: 30px; font-weight: bold;}
