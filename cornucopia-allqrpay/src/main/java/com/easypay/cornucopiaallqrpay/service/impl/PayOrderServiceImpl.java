@@ -254,19 +254,8 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
 
     @Override
     public Map updateNotify(String jsonParam) {
-        BaseParam baseParam = JsonUtil.getObjectFromJson(jsonParam, BaseParam.class);
-        Map<String, Object> bizParamMap = baseParam.getBizParamMap();
-        if (ObjectValidUtil.isInvalid(bizParamMap)) {
-            log.warn("修改支付订单通知次数失败, {}. jsonParam={}", RetEnum.RET_PARAM_NOT_FOUND.getMessage(), jsonParam);
-            return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_NOT_FOUND);
-        }
-        String payOrderId = baseParam.isNullValue("payOrderId") ? null : bizParamMap.get("payOrderId").toString();
-        Byte count = baseParam.isNullValue("count") ? null : Byte.parseByte(bizParamMap.get("count").toString());
-        if (ObjectValidUtil.isInvalid(payOrderId, count)) {
-            log.warn("修改支付订单通知次数失败, {}. jsonParam={}", RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
-            return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
-        }
-        int result = super.baseUpdateNotify(payOrderId, count);
-        return RpcUtil.createBizResult(baseParam, result);
+        Map<String, Object> map = new HashMap<>();
+        log.info("无异步，不通知");
+        return map;
     }
 }
