@@ -106,16 +106,4 @@ public class BaseService {
         return payOrderMapper.updateByExampleSelective(payOrder, example);
     }
 
-    public int baseUpdateNotify(String payOrderId, byte count) {
-        TPayOrder newPayOrder = new TPayOrder();
-        newPayOrder.setNotifycount(count);
-        newPayOrder.setLastnotifytime(System.currentTimeMillis());
-        newPayOrder.setPayOrderId(payOrderId);
-        return payOrderMapper.updateByPrimaryKeySelective(newPayOrder);
-    }
-
-    public int baseUpdateNotify(TPayOrder payOrder) {
-        return payOrderMapper.updateByPrimaryKeySelective(payOrder);
-    }
-
 }

@@ -58,9 +58,6 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
 
-        <table tableName="t_goods_order" domainObjectName="TGoodsOrder">
-            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
-        </table>
         <table tableName="t_pay_order" domainObjectName="TPayOrder"
                >
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>

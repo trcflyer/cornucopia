@@ -121,7 +121,6 @@ public class PayOrderController {
         String errorMessage;
         // 支付参数
         String mchId = params.getString("mchId"); 			    // 商户ID
-        String mchOrderNo = params.getString("mchOrderNo"); 	// 商户订单号
         String channelId = params.getString("channelId"); 	    // 渠道ID
         String amount = params.getString("amount"); 		    // 支付金额（单位分）
         String currency = params.getString("currency");         // 币种
@@ -130,17 +129,12 @@ public class PayOrderController {
         String extra = params.getString("extra");		        // 特定渠道发起时额外参数
         String param1 = params.getString("param1"); 		    // 扩展参数1
         String param2 = params.getString("param2"); 		    // 扩展参数2
-        String notifyUrl = params.getString("notifyUrl"); 		// 支付结果回调URL
         String sign = params.getString("sign"); 				// 签名
         String subject = params.getString("subject");	        // 商品主题
         String body = params.getString("body");	                // 商品描述信息
         // 验证请求参数有效性（必选项）
         if(StringUtils.isBlank(mchId)) {
             errorMessage = "request params[mchId] error.";
-            return errorMessage;
-        }
-        if(StringUtils.isBlank(mchOrderNo)) {
-            errorMessage = "request params[mchOrderNo] error.";
             return errorMessage;
         }
         if(StringUtils.isBlank(channelId)) {
@@ -155,10 +149,7 @@ public class PayOrderController {
             errorMessage = "request params[currency] error.";
             return errorMessage;
         }
-        if(StringUtils.isBlank(notifyUrl)) {
-            errorMessage = "request params[notifyUrl] error.";
-            return errorMessage;
-        }
+
         if(StringUtils.isBlank(subject)) {
             errorMessage = "request params[subject] error.";
             return errorMessage;
@@ -245,7 +236,6 @@ public class PayOrderController {
         payOrder.put("sqeId", ordIdSqe);
         payOrder.put("payOrderId", payOrder.get("transDate")+ordIdSqe);
         payOrder.put("mchId", mchId);
-        payOrder.put("mchOrderNo", mchOrderNo);
         payOrder.put("channelId", channelId);
         payOrder.put("amount", Long.parseLong(amount));
         payOrder.put("currency", currency);
@@ -257,7 +247,6 @@ public class PayOrderController {
         payOrder.put("channelMchId", payChannel.getString("channelMchId"));
         payOrder.put("param1", param1);
         payOrder.put("param2", param2);
-        payOrder.put("notifyUrl", notifyUrl);
         return payOrder;
     }
 
