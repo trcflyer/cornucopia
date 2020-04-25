@@ -5,13 +5,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.easypay.cornucopiaallqrpay.DefaultRequestValue;
 import com.easypay.cornucopiaallqrpay.biz.CheckMerIdBiz;
-import com.easypay.cornucopiaallqrpay.biz.SequenceBiz;
 import com.easypay.cornucopiaallqrpay.dal.dao.impl.TMchInfoMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TMchInfo;
 import com.easypay.cornucopiaallqrpay.util.OAuth2RequestParamHelper;
 import com.easypay.cornucopiaallqrpay.util.vx.WxApi;
 import com.easypay.cornucopiaallqrpay.util.vx.WxApiClient;
-import com.easypay.cornucopiacommon.enums.RespCode;
+import com.easypay.cornucopiacommon.result.ResultCode;
 import com.easypay.cornucopiacommon.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -88,14 +87,10 @@ public class GoodsOrderController {
         log.info("请求支付中心下单接口,响应数据:" + result);
         Map retMap = JSON.parseObject(result);
         if ("SUCCESS".equals(retMap.get("retCode"))) {
-            // 验签
-            String checkSign = PayDigestUtil.getSign(retMap, publickey, "sign", "payParams");
-            String retSign = (String) retMap.get("sign");
-            if (checkSign.equals(retSign)) {
-                log.info("=========支付中心下单验签成功=========");
-            } else {
-                System.err.println("=========支付中心下单验签失败=========");
-            }
+            log.info("=========支付中心下单成功=========");
+        }else{
+            log.info("=========支付中心下单失败=========");
+            return null;
         }
         return retMap;
     }
@@ -113,9 +108,9 @@ public class GoodsOrderController {
             model.put("dealMessage", "请求参数错误");
             return "dealMessage";
         }
-        RespCode respCode = checkMerIdBiz.checkMer(mchId);
-        if (!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())) {
-            log.info(respCode.getRespDesc());
+        ResultCode respCode = checkMerIdBiz.checkMer(mchId);
+        if (!ResultCode.SUCCESS.equals(respCode)) {
+            log.info(respCode.getMessage());
             model.put("dealMessage", "商户号不合法");
             return "dealMessage";
         }
@@ -151,9 +146,9 @@ public class GoodsOrderController {
             return "dealMessage";
         }
 
-        RespCode respCode = checkMerIdBiz.checkMer(mchId);
-        if (!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())) {
-            log.info(respCode.getRespDesc());
+        ResultCode respCode = checkMerIdBiz.checkMer(mchId);
+        if (!ResultCode.SUCCESS.equals(respCode)) {
+            log.info(respCode.getMessage());
             model.put("dealMessage", "商户号不合法");
             return "dealMessage";
         }
@@ -196,9 +191,9 @@ public class GoodsOrderController {
             return "dealMessage";
         }
         String ordAmt = AmountUtil.convertDollar2Cent(payAmt);
-        RespCode respCode = checkMerIdBiz.checkMer(mchId);
-        if (!RespCode.CODE_000.getRespCode().equals(respCode.getRespCode())) {
-            log.info(respCode.getRespDesc());
+        ResultCode respCode = checkMerIdBiz.checkMer(mchId);
+        if (!ResultCode.SUCCESS.equals(respCode)) {
+            log.info(respCode.getMessage());
             model.put("dealMessage", "输入金额错误");
             return "dealMessage";
         }
@@ -219,7 +214,6 @@ public class GoodsOrderController {
         }
 
         String view = "qrPay";
-        log.info("====== 开始接收二维码扫码支付请求 ======");
         String ua = request.getHeader("User-Agent");
         String goodsId = "10001";
         log.info("{}接收参数:goodsId={},amount={},ua={}", logPrefix, goodsId, payAmt, ua);

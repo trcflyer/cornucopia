@@ -94,6 +94,8 @@ public class PayOrderController {
                     return payOrderService.doWxPayReq(PayConstant.WxConstant.TRADE_TYPE_NATIVE, payOrder, payContext.getString("resKey"));
                 case PayConstant.PAY_CHANNEL_WX_MWEB :
                     return payOrderService.doWxPayReq(PayConstant.WxConstant.TRADE_TYPE_MWEB, payOrder, payContext.getString("resKey"));
+                case PayConstant.PAY_CHANNEL_WX_BAR_CODE :
+                    return payOrderService.doWxPayReq(PayConstant.WxConstant.TRADE_TYPE_BAR_CODE, payOrder, payContext.getString("resKey"));
                 case PayConstant.PAY_CHANNEL_ALIPAY_MOBILE :
                     return payOrderService.doAliPayReq(channelId, payOrder, payContext.getString("resKey"));
                 case PayConstant.PAY_CHANNEL_ALIPAY_PC :
@@ -101,6 +103,8 @@ public class PayOrderController {
                 case PayConstant.PAY_CHANNEL_ALIPAY_WAP :
                     return payOrderService.doAliPayReq(channelId, payOrder, payContext.getString("resKey"));
                 case PayConstant.PAY_CHANNEL_ALIPAY_QR :
+                    return payOrderService.doAliPayReq(channelId, payOrder, payContext.getString("resKey"));
+                case PayConstant.PAY_CHANNEL_ALIPAY_BAR_CODE:
                     return payOrderService.doAliPayReq(channelId, payOrder, payContext.getString("resKey"));
                 default:
                     return XXPayUtil.makeRetFail(XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_FAIL, "不支持的支付渠道类型[channelId="+channelId+"]", null, null));
@@ -226,12 +230,14 @@ public class PayOrderController {
             }
         }catch (Exception e){
             log.info("验签异常");
+            errorMessage = "Verify XX pay sign error.";
+            return errorMessage;
         }
         // 验证参数通过,返回JSONObject对象
         JSONObject payOrder = new JSONObject();
         // 先插入订单数据
         String ordIdSqe  = sequenceBiz.getSeqId("PAY_ID_SQE");
-        ordIdSqe =  StringUtils.leftPad(ordIdSqe,8,"0");
+        ordIdSqe =  StringUtils.leftPad(ordIdSqe,12,"0");
         payOrder.put("transDate", DateUtils.getCurrentTimeStrDefault().substring(0,8));
         payOrder.put("sqeId", ordIdSqe);
         payOrder.put("payOrderId", payOrder.get("transDate")+ordIdSqe);

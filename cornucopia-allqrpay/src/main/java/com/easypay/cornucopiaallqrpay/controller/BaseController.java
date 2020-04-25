@@ -1,10 +1,10 @@
 package com.easypay.cornucopiaallqrpay.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.easypay.cornucopiacommon.enums.RespCode;
 import com.easypay.cornucopiacommon.exception.BizException;
 import com.easypay.cornucopiacommon.result.CommonResult;
 import com.easypay.cornucopiaallqrpay.vo.BaseResponse;
+import com.easypay.cornucopiacommon.result.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
@@ -26,7 +26,7 @@ public class BaseController {
     public CommonResult exception(HttpServletRequest request, HttpServletResponse response,Exception e){
         log.warn(e.getMessage());
         BaseResponse baseResponse = new BaseResponse();
-        baseResponse.setRespCode(RespCode.CODE_998.getRespCode());
+        baseResponse.setRespCode(String.valueOf(ResultCode.CODE_998.getCode()));
         baseResponse.setRespDesc(e.getMessage());
         return CommonResult.success(JSONObject.toJSONString(baseResponse));
     }
@@ -41,7 +41,7 @@ public class BaseController {
     public CommonResult serviceHandle(BindException e) {
         List<ObjectError> allErrors = e.getBindingResult().getAllErrors();
         BaseResponse baseResponse = new BaseResponse();
-        baseResponse.setRespCode(RespCode.CODE_999.getRespCode());
+        baseResponse.setRespCode(String.valueOf(ResultCode.CODE_999.getCode()));
         baseResponse.setRespDesc(allErrors.get(0).getDefaultMessage());
         return CommonResult.success(JSONObject.toJSONString(baseResponse));
     }

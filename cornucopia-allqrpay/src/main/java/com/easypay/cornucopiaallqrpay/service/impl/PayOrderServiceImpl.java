@@ -78,7 +78,12 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         paramMap.put("tradeType", tradeType);
         paramMap.put("payOrder", payOrder);
         String jsonParam = RpcUtil.createBaseParam(paramMap);
-        Map<String, Object> result = payChannel4WxService.doWxPayReq(jsonParam);
+        Map<String, Object> result= null;
+        if(tradeType.equals(PayConstant.PAY_CHANNEL_WX_BAR_CODE)){
+            result = payChannel4WxService.doWxPayBarCodeReq(jsonParam);
+        }else {
+            result = payChannel4WxService.doWxPayReq(jsonParam);
+        }
         String s = RpcUtil.mkRet(result);
         if(s == null) {
             return XXPayUtil.makeRetData(XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_FAIL, "0111", "调用微信支付失败"), resKey);
@@ -105,6 +110,9 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
                 break;
             case PayConstant.PAY_CHANNEL_ALIPAY_QR :
                 result = payChannel4AliService.doAliPayQrReq(jsonParam);
+                break;
+            case PayConstant.PAY_CHANNEL_ALIPAY_BAR_CODE:
+                result = payChannel4AliService.doAliPayBarCodeReq(jsonParam);
                 break;
             default:
                 result = null;

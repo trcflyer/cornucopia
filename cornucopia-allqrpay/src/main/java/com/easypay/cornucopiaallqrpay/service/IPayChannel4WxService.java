@@ -11,4 +11,7 @@ public interface IPayChannel4WxService {
 
     Map doWxPayReq(String jsonParam);
 
+    Map doWxPayBarCodeReq(String jsonParam);
+
+
 }

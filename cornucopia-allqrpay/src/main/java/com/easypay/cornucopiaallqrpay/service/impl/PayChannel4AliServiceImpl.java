@@ -5,14 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.domain.AlipayTradePagePayModel;
-import com.alipay.api.domain.AlipayTradePrecreateModel;
-import com.alipay.api.domain.AlipayTradeWapPayModel;
-import com.alipay.api.request.AlipayTradeAppPayRequest;
-import com.alipay.api.request.AlipayTradePagePayRequest;
-import com.alipay.api.request.AlipayTradePrecreateRequest;
-import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.domain.*;
+import com.alipay.api.request.*;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayChannel;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayOrder;
 import com.easypay.cornucopiaallqrpay.service.BaseService;
@@ -285,4 +279,71 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         return RpcUtil.createBizResult(baseParam, map);
     }
 
+    @Override
+    public Map doAliPayBarCodeReq(String jsonParam) {
+        String logPrefix = "【支付宝当面付之条码支付下单】";
+        BaseParam baseParam = JsonUtil.getObjectFromJson(jsonParam, BaseParam.class);
+        Map<String, Object> bizParamMap = baseParam.getBizParamMap();
+        if (ObjectValidUtil.isInvalid(bizParamMap)) {
+            log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_NOT_FOUND.getMessage(), jsonParam);
+            return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_NOT_FOUND);
+        }
+        JSONObject payOrderObj = baseParam.isNullValue("payOrder") ? null : JSONObject.parseObject(bizParamMap.get("payOrder").toString());
+        TPayOrder payOrder = BeanConvertUtils.map2Bean(payOrderObj, TPayOrder.class);
+        if (ObjectValidUtil.isInvalid(payOrder)) {
+            log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
+            return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
+        }
+        String payOrderId = payOrder.getPayOrderId();
+        String mchId = payOrder.getMchId();
+        String channelId = payOrder.getChannelId();
+        TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
+        alipayConfig.init(payChannel.getParam());
+        AlipayClient client = new DefaultAlipayClient(alipayConfig.getUrl(), alipayConfig.getApp_id(), alipayConfig.getRsa_private_key(), AlipayConfig.FORMAT, AlipayConfig.CHARSET, alipayConfig.getAlipay_public_key(), AlipayConfig.SIGNTYPE);
+        AlipayTradePayRequest alipay_request = new AlipayTradePayRequest();
+        AlipayTradePayModel model = new AlipayTradePayModel();
+        // 封装请求支付信息
+        model.setOutTradeNo(payOrderId);
+        model.setSubject(payOrder.getSubject());
+        model.setTotalAmount(AmountUtil.convertCent2Dollar(payOrder.getAmount().toString()));
+        model.setBody(payOrder.getBody());
+        model.setScene(payOrder.getParam1());
+        model.setAuthCode(payOrder.getParam2());
+        // 获取objParams参数
+        String objParams = payOrder.getExtra();
+        if (StringUtils.isNotEmpty(objParams)) {
+            try {
+                JSONObject objParamsJson = JSON.parseObject(objParams);
+                if(StringUtils.isNotBlank(objParamsJson.getString("discountable_amount"))) {
+                    //可打折金额
+                    model.setDiscountableAmount(objParamsJson.getString("discountable_amount"));
+                }
+                if(StringUtils.isNotBlank(objParamsJson.getString("undiscountable_amount"))) {
+                    //不可打折金额
+                    model.setUndiscountableAmount(objParamsJson.getString("undiscountable_amount"));
+                }
+            } catch (Exception e) {
+                log.error("{}objParams参数格式错误！", logPrefix);
+            }
+        }
+        alipay_request.setBizModel(model);
+        // 设置异步通知地址
+        alipay_request.setNotifyUrl(alipayConfig.getNotify_url());
+        // 设置同步地址
+        alipay_request.setReturnUrl(alipayConfig.getReturn_url());
+        String payUrl = null;
+        try {
+            payUrl = client.execute(alipay_request).getBody();
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+        log.info("{}生成跳转路径：payUrl={}", logPrefix, payUrl);
+        super.baseUpdateStatus4Ing(payOrderId, null);
+        log.info("{}生成请求支付宝数据,req={}", logPrefix, alipay_request.getBizModel());
+        log.info("###### 商户统一下单处理完成 ######");
+        Map<String, Object> map = XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_SUCCESS, null);
+        map.put("payOrderId", payOrderId);
+        map.put("payUrl", payUrl);
+        return RpcUtil.createBizResult(baseParam, map);
+    }
 }

@@ -15,7 +15,9 @@ import com.easypay.cornucopiacommon.utils.BeanConvertUtils;
 import com.easypay.cornucopiacommon.utils.JsonUtil;
 import com.easypay.cornucopiacommon.utils.ObjectValidUtil;
 import com.easypay.cornucopiacommon.utils.RpcUtil;
+import com.github.binarywang.wxpay.bean.request.WxPayMicropayRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.bean.result.WxPayMicropayResult;
 import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
@@ -196,6 +198,105 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
         request.setLimitPay(limitPay);
         request.setOpenid(openId);
         request.setSceneInfo(sceneInfo);
+
+        return request;
+    }
+
+    public Map doWxPayBarCodeReq(String jsonParam){
+        String logPrefix = "【微信支付付款码支付】";
+        BaseParam baseParam = JsonUtil.getObjectFromJson(jsonParam, BaseParam.class);
+        Map<String, Object> bizParamMap = baseParam.getBizParamMap();
+        try{
+            if (ObjectValidUtil.isInvalid(bizParamMap)) {
+                log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_NOT_FOUND.getMessage(), jsonParam);
+                return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_NOT_FOUND);
+            }
+            JSONObject payOrderObj = baseParam.isNullValue("payOrder") ? null : JSONObject.parseObject(bizParamMap.get("payOrder").toString());
+            String tradeType = baseParam.isNullValue("tradeType") ? null : bizParamMap.get("tradeType").toString();
+            TPayOrder payOrder = BeanConvertUtils.map2Bean(payOrderObj, TPayOrder.class);
+            if (ObjectValidUtil.isInvalid(payOrder, tradeType)) {
+                log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
+                return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
+            }
+            String mchId = payOrder.getMchId();
+            String channelId = payOrder.getChannelId();
+            TPayChannel payChannel = super.baseSelectPayChannel(mchId, channelId);
+            WxPayConfig wxPayConfig = WxPayUtil.getWxPayConfig(payChannel.getParam(), tradeType, wxPayProperties.getCertRootPath(), wxPayProperties.getNotifyUrl());
+            WxPayService wxPayService = new WxPayServiceImpl();
+            wxPayService.setConfig(wxPayConfig);
+            WxPayMicropayRequest wxPayUnifiedOrderRequest = buildWxPayMicropayRequest(payOrder, wxPayConfig);
+            String payOrderId = payOrder.getPayOrderId();
+            WxPayMicropayResult wxPayMicropayResult;
+            try {
+                wxPayMicropayResult = wxPayService.micropay(wxPayUnifiedOrderRequest);
+                log.info("{} >>> 下单成功", logPrefix);
+                Map<String, Object> map = new HashMap<>();
+                map.put("payOrderId", payOrderId);
+                map.put("prepayId", wxPayMicropayResult.getTransactionId());
+                int result = super.baseUpdateStatus4Ing(payOrderId, wxPayMicropayResult.getTransactionId());
+                log.info("更新第三方支付订单号:payOrderId={},微信订单号transaction_id={},result={}", payOrderId, wxPayMicropayResult.getTransactionId(), result);
+
+                Map<String, String> payInfo = new HashMap<>();
+                String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+                String nonceStr = String.valueOf(System.currentTimeMillis());
+                payInfo.put("appId", wxPayMicropayResult.getAppid());
+                // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                payInfo.put("timeStamp", timestamp);
+                payInfo.put("nonceStr", nonceStr);
+                payInfo.put("package", "prepay_id=" + wxPayMicropayResult.getTransactionId());
+                payInfo.put("signType", WxPayConstants.SignType.MD5);
+                payInfo.put("paySign", SignUtils.createSign(payInfo, wxPayConfig.getMchKey(), null));
+                map.put("payParams", payInfo);
+
+
+                return RpcUtil.createBizResult(baseParam, map);
+            } catch (WxPayException e) {
+                log.error(e.getMessage(), "下单失败");
+                //出现业务错误
+                log.info("{}下单返回失败", logPrefix);
+                log.info("err_code:{}", e.getErrCode());
+                log.info("err_code_des:{}", e.getErrCodeDes());
+
+                return RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_WX_PAY_CREATE_FAIL);
+
+                // return XXPayUtil.makeRetData(XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_FAIL, "0111", "调用微信支付失败," + e.getErrCode() + ":" + e.getErrCodeDes()), resKey);
+            }
+        }catch (Exception e) {
+            log.error(e.getMessage(), "微信支付付款码支付异常");
+            return RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_WX_PAY_CREATE_FAIL);
+
+            //return XXPayUtil.makeRetFail(XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_FAIL, "", PayConstant.RETURN_VALUE_FAIL, PayEnum.ERR_0001));
+        }
+    }
+    /**
+     * 构建微信统一下单请求数据
+     * @param payOrder
+     * @param wxPayConfig
+     * @return
+     */
+    WxPayMicropayRequest buildWxPayMicropayRequest(TPayOrder payOrder, WxPayConfig wxPayConfig) {
+        String payOrderId = payOrder.getPayOrderId();
+        Integer totalFee = payOrder.getAmount().intValue();// 支付金额,单位分
+        String body = payOrder.getBody();
+        String detail = null;
+        String attach = null;
+        String outTradeNo = payOrderId;
+        String feeType = "CNY";
+        String spBillCreateIP = payOrder.getClientIp();
+        String goodsTag = null;
+        String limitPay = null;
+        // 微信付款码支付请求对象
+        WxPayMicropayRequest request =  WxPayMicropayRequest.newBuilder().build();
+
+        request.setBody(body);
+        request.setDetail(detail);
+        request.setAttach(attach);
+        request.setOutTradeNo(outTradeNo);
+        request.setFeeType(feeType);
+        request.setTotalFee(totalFee);
+        request.setSpbillCreateIp(spBillCreateIP);
+        request.setGoodsTag(goodsTag);
+        request.setLimitPay(limitPay);
 
         return request;
     }
