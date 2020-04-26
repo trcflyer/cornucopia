@@ -2,7 +2,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <meta charset="htf-8" />
+    <meta charset="htf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <base id="base" href="${base}">
     <title>互恩智惠</title>
@@ -17,96 +17,120 @@
     <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <style>
-        body{font-family: 'Microsoft YaHei'; height:100%;background: rgb(250, 250, 250);}
-        #amount,#error{height: 80px; line-height: 80px; text-align: center; color: #f00; font-size: 30px; font-weight: bold;}
-        #error{font-size: 20px;}
-        #info{padding: 0 10px; font-size: 12px;}
+<style type="text/css">
+    #main{
+        font-family: sans-serif;
+    }
 
-        .fr{text-align: right; font-weight: bold;}
+    #head{
+        text-align: center;
+        padding-top: 10rem;
+        font-size: 3rem;
+        margin-bottom: 4rem;
+    }
+    .text_title{
+        margin: 0.6rem;
+    }
 
-        .logo {  background-color: white;  width: 100%;}
+    #controls_amount{
+        margin: 0 auto;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border-radius: 1rem 1rem 1rem 1rem;
+        background: #ffffff;
+        width: 85%;
+        height: 8rem;
+    }
 
-        .page-section {
-            background: rgb(250, 250, 250);
-            width: 100%;
-            height: 50%;
-            display: block;
-            margin-top:10px;
-        }
+    #amount{
+        float: left;
+        width: 70%;
+        margin: 0 auto;
 
+    }
 
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-left: 10px;
-            margin-right: 10px;
-            height: 120px;
-            align-items: center;
-            margin-bottom:10px;
-        }
+    #number{
+        font-size: 3rem;
+        height: 7.5rem;
+        border:0;
+        outline:0;
+    }
 
-        .form-row-label {
-            font-size: 18px;
-            margin: 10px 15px;
-            text-align: right;
-            color: #333333;
-        }
+    #icon{
+        float: right;
+        font-size: 4rem;
+        color: #333333;
+        line-height: 8rem;
 
-        .form-row-content {
+    }
 
-            font-size: 15px;
+    #controls_text{
+        margin: 0 auto;
+        margin-top: 3rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border-radius: 1rem 1rem 1rem 1rem;
+        background: #ffffff;
+        width: 85%;
+        height: 8rem;
+    }
 
-        }
+    #text{
+        width: 100%;
+        font-size: 2.5rem;
+        height: 7.5rem;
+        border: 0;
+        outline:0;
+    }
 
-        .input{
-            height:25px;
-            border:1px solid #F5BFBB;
-            border-radius:6px;
-            align:right;
-        }
+    input{
+        border: 0;
+        background: none;
+        outline:0;
+        border:1px solid #ffffff;
+        border-radius: 1rem 1rem 1rem 1rem;
+    }
 
-        .login-button{
-            background:#EA5042;
-            border-radius:220px;
-            margin: 50px 100px 0;
-            padding: 10px 30px;
-            border:2px solid #EA5042;
-            font-size:16px;
-            color:white;
-            vertical-align:middle;
+    #button_div{
+        padding: 5rem;
+        text-align: center;
+    }
 
-        }
-    </style>
-    <script src="//cdn.jsdelivr.net/jquery/1.12.1/jquery.min.js"></script>
+    .button{
+        background: #e61c21;
+        width: 25rem;
+        height: 8rem;
+        border-radius:50rem 50rem 50rem 50rem;
+        font-size: 2.5rem;
+        color: #ffffff;
+</style>
 </head>
-<body>
-<div style="width:100%;text-align:center;background: rgb(250, 250, 250);">
-
-    <img class="logo" src="${base}/img_login.png"  />
-
-    <div class="page-section">
-<form action="/allqrpay/goods/qrPay.html" method="post">
-
-    <table border="0" align="center">
-        <tbody>
-        <tr class="form-row" border="0" align="center">
-            <td class="form-row-label" >支付金额:</td>
-            <td class="form-row-content"><input class="input"  type="text" name="payAmt"/></td>
-            <td class="form-row-label">元</td>
-        </tr>
-        </tbody>
-
-
-    </table>
-
-    <input type="hidden" name="mchId" value="${mchId}">
-    <input type="hidden" name="key" value="${key}">
-    <input type="hidden" name="checkValue" value="${checkValue}">
-    <br><br>
-    <input class="login-button" type="submit" value="确认支付">
-</form>
+<body style="background:#f6f6f6;">
+<div id="main">
+    <div id="head">
+        <img src="${base}/logo.png" width="120px" height="120px" />
+        <p class="text_title">${mchName}</p>
     </div>
+    <form id="formid" action="/allqrpay/goods/qrPay.html" method="post">
+        <div id="controls_amount">
+            <div id="amount">
+                <input type="text" name="payAmt" id="number" placeholder="消费金额" title="金额/元" required="required" onkeyup="this.value=/^[0-9]*\.?[0-9]{0,2}$/.test(this.value) ? this.value : this.value.substring(0,this.value.length-1)"/>
+            </div>
+            <div id="icon">
+                元
+            </div>
+        </div>
+        <div id="controls_text">
+            <input type="text" id="text" placeholder="添加备注(20字以内)" maxlength="40" />
+        </div>
+        <input type="hidden" name="mchId" value="${mchId}">
+        <input type="hidden" name="key" value="${key}">
+        <input type="hidden" name="checkValue" value="${checkValue}">
+
+        <div id="button_div">
+            <input type="submit"  class="button" value="确认支付">
+        </div>
+    </form>
 </div>
 </body>
 </html>

@@ -19,8 +19,43 @@
     <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
+<style type="text/css">
+    #main{
+        font-family: sans-serif;
+    }
+    #successful{
+        padding-top: 10rem;
+        text-align: center;
+    }
 
+    .text{
+        font-size: 4rem;
+        margin: 2rem;
+    }
+
+    #button_div{
+        padding: 5rem;
+        text-align: center;
+    }
+
+    .button{
+        background: #e61c21;
+        width: 25rem;
+        height: 8rem;
+        border-radius:50rem 50rem 50rem 50rem;
+        font-size: 2.5rem;
+        color: #ffffff;
+    }
+</style>
 <body>
-<div><h4 >支付完成</h4></div>
+<div id="main">
+    <div id="successful">
+        <img src="${base}/successful.png" width="220px" height="220px" />
+        <p class="text">付款成功</p>
+    </div>
+    <#--<div id="button_div">-->
+        <#--<button class="button"><b>查看订单详情</b></button>-->
+    <#--</div>-->
+</div>
 </body>
 </html>

@@ -176,6 +176,7 @@ public class GoodsOrderController {
             return "dealMessage";
         }
         model.put("mchId", mchId);
+        model.put("mchName",tMchInfo.getName());
         return "payOrder";
     }
 
@@ -285,7 +286,7 @@ public class GoodsOrderController {
                 }
             }
         }
-        model.put("amount", ordAmt);
+        model.put("payAmt", payAmt);
         if (orderMap != null) {
             model.put("orderMap", orderMap);
         }

@@ -28,7 +28,7 @@
 </head>
 <body>
 <#if (orderMap.resCode == 'SUCCESS')>
-<div id="amount">¥ ${amount}</div>
+<div id="amount"> ${payAmt} 元</div>
 <div id="info">
     <table>
         <tr>
