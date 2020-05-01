@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ public class ReverseSweepOrderController {
         paramMap.put("channelId", params.get("channelId"));             // 支付渠道ID, WX_NATIVE,ALIPAY_WAP
         paramMap.put("amount", ordAmt);                          // 支付金额,单位分
         paramMap.put("currency", "cny");                    // 币种, cny-人民币
-        paramMap.put("clientIp", "114.112.124.236");        // 用户地址,IP或手机号
+        paramMap.put("clientIp", params.get("clientIP"));        // 用户地址,IP或手机号
         paramMap.put("device", "WEB");                      // 设备
         paramMap.put("subject", "反扫刷脸支付");
         paramMap.put("body", "反扫刷脸支付");
@@ -90,20 +91,20 @@ public class ReverseSweepOrderController {
     }
 
     @RequestMapping("/qrPay")
-    public CommonResult qrPay( HttpServletRequest request) {
-        CreateOrderResponse response = new CreateOrderResponse();
+    public CommonResult qrPay(HttpServletRequest request, HttpServletResponse response) {
+        CreateOrderResponse createOrderResponse = new CreateOrderResponse();
         String logPrefix = "【条码支付】";
         String scene = request.getParameter("scene");
         String authCode = request.getParameter("authCode");
         String payAmt = request.getParameter("payAmt");
         String memberId  = request.getParameter("memberId");
-        String ordAmt = AmountUtil.convertDollar2Cent(payAmt);
 
         if (StringUtils.isBlank(memberId) || StringUtils.isBlank(payAmt) || StringUtils.isBlank(scene) || StringUtils.isBlank(authCode)) {
             log.info("{}请求参数错误,{}", logPrefix,"必填参数不可为空");
             return CommonResult.failed(ResultCode.CODE_999,"必填参数不可为空");
         }
 
+        String ordAmt = AmountUtil.convertDollar2Cent(payAmt);
        TMchInfo tMchInfo =  tMchInfoMapper.selectByMemberId(memberId);
        if(tMchInfo == null){
            log.info("{}请求参数错误,{}", logPrefix,"商户号不存在");
@@ -116,14 +117,15 @@ public class ReverseSweepOrderController {
         params.put("channelId",PayConstant.PAY_CHANNEL_ALIPAY_BAR_CODE);
         params.put("scene",scene);
         params.put("authCode",authCode);
+        params.put("clientIP",String.valueOf(request.getAttribute("clientIP")));
 
         orderMap = createPayOrder(ordAmt, params, tMchInfo.getMchId());
         if(orderMap == null){
             return CommonResult.failed(ResultCode.CODE_200);
         }
-        response.setPayOrderId(orderMap.get("payOrderId"));
-        response.setOrderInfo(orderMap.get("payUrl"));
-        return CommonResult.success(ResultCode.SUCCESS,JSONObject.toJSONString(response));
+        createOrderResponse.setPayOrderId(orderMap.get("payOrderId"));
+        createOrderResponse.setOrderInfo(orderMap.get("payUrl"));
+        return CommonResult.success(ResultCode.SUCCESS,JSONObject.toJSONString(createOrderResponse));
     }
 
 }

@@ -50,7 +50,7 @@
 <body>
 <div id="main">
     <div id="successful">
-        <img src="${base}/successful.png" width="120px" height="120px" />
+        <img src="${base}/successful.png" width="120px" height="1   20px" />
         <p class="text">付款成功</p>
     </div>
     <#--<div id="button_div">-->

@@ -19,6 +19,7 @@ public class LogInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         MDC.put(TRACEID, UUID.randomUUID().toString().replace("-",""));
+        getRequestIp(request);
         Map<String, String> requestMap = getAllRequestParam(request);
         log.info("请求地址为:{},请求参数为:{}",request.getRequestURI(),requestMap);
         return true;
@@ -35,6 +36,20 @@ public class LogInterceptor implements HandlerInterceptor {
             }
         }
         return res;
+    }
+    private void getRequestIp(HttpServletRequest request){
+        // 获取请求IP地址
+        String ipAddr = request.getHeader("X-Forwarded-For");
+        if (ipAddr == null || ipAddr.trim().length() == 0) {
+            ipAddr = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddr == null || ipAddr.trim().length() == 0) {
+            ipAddr = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddr == null || ipAddr.trim().length() == 0) {
+            ipAddr = request.getRemoteAddr();
+        }
+        request.setAttribute("clientIP", ipAddr);
     }
 
     @Override

@@ -243,7 +243,8 @@ public class GoodsOrderController {
             return view;
         }
         // 先插入订单数据
-        String clientIp = "47.98.210.13";
+        String clientIp = String.valueOf(request.getAttribute("clientIP"));
+
         Map<String, String> orderMap = null;
         if ("alipay".equals(client)) {
             log.info("{}{}扫码下单", logPrefix, "支付宝");
