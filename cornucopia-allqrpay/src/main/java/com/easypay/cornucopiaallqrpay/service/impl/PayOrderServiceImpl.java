@@ -44,17 +44,19 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         return Integer.parseInt(s);
     }
 
-    public JSONObject queryPayOrder(String mchId, String payOrderId, String mchOrderNo, String executeNotify) {
+    public JSONObject queryPayOrder(String mchId,String deviceSn, String payOrderId, String mchOrderId, String executeNotify) {
         Map<String,Object> paramMap = new HashMap<>();
         Map<String, Object> result;
         if(StringUtils.isNotBlank(payOrderId)) {
             paramMap.put("mchId", mchId);
+            paramMap.put("deviceSn", deviceSn);
             paramMap.put("payOrderId", payOrderId);
             String jsonParam = RpcUtil.createBaseParam(paramMap);
             result = selectPayOrderByMchIdAndPayOrderId(jsonParam);
         }else {
             paramMap.put("mchId", mchId);
-            paramMap.put("mchOrderNo", mchOrderNo);
+            paramMap.put("deviceSn", deviceSn);
+            paramMap.put("mchOrderId", mchOrderId);
             String jsonParam = RpcUtil.createBaseParam(paramMap);
             result = selectPayOrderByMchIdAndMchOrderNo(jsonParam);
         }
@@ -178,11 +180,12 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         }
         String mchId = baseParam.isNullValue("mchId") ? null : bizParamMap.get("mchId").toString();
         String payOrderId = baseParam.isNullValue("payOrderId") ? null : bizParamMap.get("payOrderId").toString();
+        String deviceSn = baseParam.isNullValue("deviceSn") ? null : bizParamMap.get("deviceSn").toString();
         if (ObjectValidUtil.isInvalid(mchId, payOrderId)) {
             log.warn("根据商户号和支付订单号查询支付订单失败, {}. jsonParam={}", RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
             return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
         }
-        TPayOrder payOrder = super.baseSelectPayOrderByMchIdAndPayOrderId(mchId, payOrderId);
+        TPayOrder payOrder = super.baseSelectPayOrderByMchIdAndPayOrderId(mchId,deviceSn, payOrderId);
         if(payOrder == null) return RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_DATA_NOT_EXISTS);
         String jsonResult = JsonUtil.object2Json(payOrder);
         return RpcUtil.createBizResult(baseParam, jsonResult);
@@ -197,12 +200,13 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
             return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_NOT_FOUND);
         }
         String mchId = baseParam.isNullValue("mchId") ? null : bizParamMap.get("mchId").toString();
-        String mchOrderNo = baseParam.isNullValue("mchOrderNo") ? null : bizParamMap.get("mchOrderNo").toString();
-        if (ObjectValidUtil.isInvalid(mchId, mchOrderNo)) {
+        String mchOrderId = baseParam.isNullValue("mchOrderId") ? null : bizParamMap.get("mchOrderId").toString();
+        String deviceSn = baseParam.isNullValue("deviceSn") ? null : bizParamMap.get("deviceSn").toString();
+        if (ObjectValidUtil.isInvalid(mchId, mchOrderId,deviceSn)) {
             log.warn("根据商户号和商户订单号查询支付订单失败, {}. jsonParam={}", RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
             return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
         }
-        TPayOrder payOrder = super.baseSelectPayOrderByMchIdAndMchOrderNo(mchId, mchOrderNo);
+        TPayOrder payOrder = super.baseSelectPayOrderByMchIdAndMchOrderNo(mchId,deviceSn, mchOrderId);
         if(payOrder == null) return RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_DATA_NOT_EXISTS);
         String jsonResult = JsonUtil.object2Json(payOrder);
         return RpcUtil.createBizResult(baseParam, jsonResult);

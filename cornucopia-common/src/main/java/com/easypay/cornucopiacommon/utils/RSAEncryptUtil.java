@@ -24,9 +24,9 @@ public class RSAEncryptUtil {
      * @param privateKey 私钥
      * @return 签名
      */
-    public static String sign(Map<String,Object> map, String privateKey) throws Exception {
+    public static String sign(Map<String,String> map, String privateKey) throws Exception {
         ArrayList<String> list = new ArrayList<String>();
-        for(Map.Entry<String,Object> entry:map.entrySet()){
+        for(Map.Entry<String,String> entry:map.entrySet()){
             if(!"".equals(entry.getValue()) && null != entry.getValue()){
                 list.add(entry.getKey() + "=" + entry.getValue() + "&");
             }

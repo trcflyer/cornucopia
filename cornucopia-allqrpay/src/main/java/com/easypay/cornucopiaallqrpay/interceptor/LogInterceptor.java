@@ -49,7 +49,7 @@ public class LogInterceptor implements HandlerInterceptor {
         if (ipAddr == null || ipAddr.trim().length() == 0) {
             ipAddr = request.getRemoteAddr();
         }
-        request.setAttribute("clientIP", ipAddr);
+        request.setAttribute("clientIp", ipAddr);
     }
 
     @Override

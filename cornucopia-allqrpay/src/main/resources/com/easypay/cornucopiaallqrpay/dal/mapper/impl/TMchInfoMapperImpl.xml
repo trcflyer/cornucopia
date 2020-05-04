@@ -8,11 +8,4 @@
         from t_mch_info
         where Mch_Id = #{mchId}
     </select>
-    <select id="selectByMemberId" resultMap="com.easypay.cornucopiaallqrpay.dal.dao.TMchInfoMapper.BaseResultMap"
-    >
-        select
-        <include refid="com.easypay.cornucopiaallqrpay.dal.dao.TMchInfoMapper.Base_Column_List" />
-        from t_mch_info
-        where member_id = #{memberId}
-    </select>
 </mapper>

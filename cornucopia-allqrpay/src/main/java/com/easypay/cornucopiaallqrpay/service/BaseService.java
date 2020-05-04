@@ -51,20 +51,22 @@ public class BaseService {
         return payOrderMapper.selectByPayOrderId(payOrderId);
     }
 
-    public TPayOrder baseSelectPayOrderByMchIdAndPayOrderId(String mchId, String payOrderId) {
+    public TPayOrder baseSelectPayOrderByMchIdAndPayOrderId(String mchId,String deviceSn, String payOrderId) {
         TPayOrderExample example = new TPayOrderExample();
         TPayOrderExample.Criteria criteria = example.createCriteria();
         criteria.andMchIdEqualTo(mchId);
         criteria.andPayOrderIdEqualTo(payOrderId);
+        criteria.andDeviceSnEqualTo(deviceSn);
         List<TPayOrder> payOrderList = payOrderMapper.selectByExample(example);
         return CollectionUtils.isEmpty(payOrderList) ? null : payOrderList.get(0);
     }
 
-    public TPayOrder baseSelectPayOrderByMchIdAndMchOrderNo(String mchId, String mchOrderNo) {
+    public TPayOrder baseSelectPayOrderByMchIdAndMchOrderNo(String mchId,String deviceSn, String mchOrderId) {
         TPayOrderExample example = new TPayOrderExample();
         TPayOrderExample.Criteria criteria = example.createCriteria();
         criteria.andMchIdEqualTo(mchId);
-        criteria.andPayOrderIdEqualTo(mchOrderNo);
+        criteria.andMchOrderIdEqualTo(mchOrderId);
+        criteria.andDeviceSnEqualTo(deviceSn);
         List<TPayOrder> payOrderList = payOrderMapper.selectByExample(example);
         return CollectionUtils.isEmpty(payOrderList) ? null : payOrderList.get(0);
     }

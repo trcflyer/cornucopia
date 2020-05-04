@@ -29,7 +29,7 @@ public interface IPayOrderService {
 
     int createPayOrder(JSONObject payOrder);
 
-    JSONObject queryPayOrder(String mchId, String payOrderId, String mchOrderNo, String executeNotify);
+    JSONObject queryPayOrder(String mchId,String deviceSn, String payOrderId, String mchOrderId, String executeNotify);
 
     String doWxPayReq(String tradeType, JSONObject payOrder, String resKey);
 

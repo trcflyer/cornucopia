@@ -2,11 +2,14 @@ package com.easypay.cornucopiaallqrpay.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.easypay.cornucopiaallqrpay.biz.CheckMerOrdIdBiz;
 import com.easypay.cornucopiaallqrpay.biz.SequenceBiz;
 import com.easypay.cornucopiaallqrpay.service.IMchInfoService;
 import com.easypay.cornucopiaallqrpay.service.IPayChannelService;
 import com.easypay.cornucopiaallqrpay.service.IPayOrderService;
 import com.easypay.cornucopiacommon.constant.PayConstant;
+import com.easypay.cornucopiacommon.result.CommonResult;
+import com.easypay.cornucopiacommon.result.ResultCode;
 import com.easypay.cornucopiacommon.utils.DateUtils;
 import com.easypay.cornucopiacommon.utils.EncryptUtil;
 import com.easypay.cornucopiacommon.utils.RSAEncryptUtil;
@@ -45,6 +48,9 @@ public class PayOrderController {
 
     @Value("${myrsa.privatekey}")
     String myprivatekey;
+
+    @Autowired
+    private CheckMerOrdIdBiz checkMerOrdIdBiz;
 
     @Autowired
     private SequenceBiz sequenceBiz;
@@ -136,6 +142,8 @@ public class PayOrderController {
         String sign = params.getString("sign"); 				// 签名
         String subject = params.getString("subject");	        // 商品主题
         String body = params.getString("body");	                // 商品描述信息
+        String mchOrderId = params.getString("mchOrderId");	       // 前置订单号
+        String deviceSn = params.getString("deviceSn");	       // 前置订单号
         // 验证请求参数有效性（必选项）
         if(StringUtils.isBlank(mchId)) {
             errorMessage = "request params[mchId] error.";
@@ -162,6 +170,14 @@ public class PayOrderController {
             errorMessage = "request params[body] error.";
             return errorMessage;
         }
+        if(StringUtils.isBlank(mchOrderId)) {
+            errorMessage = "request params[mchOrderId] error.";
+            return errorMessage;
+        }
+        if (!ResultCode.SUCCESS.equals(checkMerOrdIdBiz.checkMerOrdId(mchId,mchOrderId))) {
+            return "商户订单号重复";
+        }
+
         // 根据不同渠道,判断extra参数
         if(PayConstant.PAY_CHANNEL_WX_JSAPI.equalsIgnoreCase(channelId)) {
             if(StringUtils.isEmpty(extra)) {
@@ -250,9 +266,11 @@ public class PayOrderController {
         payOrder.put("subject", subject);
         payOrder.put("body", body);
         payOrder.put("extra", extra);
+        payOrder.put("mchOrderId", mchOrderId);
         payOrder.put("channelMchId", payChannel.getString("channelMchId"));
         payOrder.put("param1", param1);
         payOrder.put("param2", param2);
+        payOrder.put("deviceSn", deviceSn);
         return payOrder;
     }
 

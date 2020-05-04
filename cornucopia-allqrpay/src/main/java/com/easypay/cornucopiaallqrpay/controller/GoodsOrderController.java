@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.easypay.cornucopiaallqrpay.DefaultRequestValue;
 import com.easypay.cornucopiaallqrpay.biz.CheckMerIdBiz;
+import com.easypay.cornucopiaallqrpay.biz.SequenceBiz;
 import com.easypay.cornucopiaallqrpay.dal.dao.impl.TMchInfoMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TMchInfo;
 import com.easypay.cornucopiaallqrpay.util.OAuth2RequestParamHelper;
@@ -34,6 +35,9 @@ public class GoodsOrderController {
     private TMchInfoMapperImpl tMchInfoMapper;
 
     @Autowired
+    private SequenceBiz sequenceBiz;
+
+    @Autowired
     private DefaultRequestValue defaultRequestValue;
 
     @Value("${frontrsa.publickey}")
@@ -54,8 +58,8 @@ public class GoodsOrderController {
     static final String AppID = "wx94099cff69f2c74e";
     static final String AppSecret = "0efb27b66c84c449858cfe5d09d5f73c";
 
-    private Map createPayOrder(String ordAmt ,Map<String, Object> params, String mchId,String clientIp) {
-        HashMap<String, Object> paramMap = new HashMap<String, Object>();
+    private Map createPayOrder(String ordAmt ,Map<String, String> params, String mchId,String clientIp) {
+        HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("mchId", mchId);                       // 商户ID
         paramMap.put("channelId", params.get("channelId"));             // 支付渠道ID, WX_NATIVE,ALIPAY_WAP
         paramMap.put("amount", ordAmt);                          // 支付金额,单位分
@@ -65,7 +69,9 @@ public class GoodsOrderController {
         paramMap.put("subject", "聚合扫码支付");
         paramMap.put("body", "聚合扫码支付");
         paramMap.put("param1", "");                         // 扩展参数1
-        paramMap.put("param2", "");                         // 扩展参数2
+        paramMap.put("param2", "");                         // 扩展参数2 ORD_ID_SQE
+        paramMap.put("mchOrderId", sequenceBiz.getSeqId("ORD_ID_SQE"));
+
 
         JSONObject extra = new JSONObject();
         extra.put("openId", params.get("openId"));
@@ -117,7 +123,7 @@ public class GoodsOrderController {
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
         try {
-            HashMap map = new HashMap(2);
+            HashMap<String,String> map = new HashMap<String,String>(2);
             map.put("mchId", mchId);
             map.put("key", tMchInfo.getRandomKey());
 
@@ -175,7 +181,6 @@ public class GoodsOrderController {
             model.put("dealMessage", "系统异常");
             return "dealMessage";
         }
-        model.put("mchId", mchId);
         model.put("mchName",tMchInfo.getName());
         return "payOrder";
     }
@@ -243,7 +248,7 @@ public class GoodsOrderController {
             return view;
         }
         // 先插入订单数据
-        String clientIp = String.valueOf(request.getAttribute("clientIP"));
+        String clientIp = String.valueOf(request.getAttribute("clientIp"));
 
         Map<String, String> orderMap = null;
         if ("alipay".equals(client)) {

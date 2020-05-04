@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface TPayOrderMapperImpl extends TPayOrderMapper {
 
     TPayOrder selectByPayOrderId(@Param("payOrderId") String payOrderId);
+
+    TPayOrder selectMchOrderId(@Param("mchId") String mchId,@Param("mchOrderId") String mchOrderId);
+
 }
