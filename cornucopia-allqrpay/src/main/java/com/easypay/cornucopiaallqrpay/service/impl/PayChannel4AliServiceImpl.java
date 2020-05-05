@@ -7,6 +7,7 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.*;
 import com.alipay.api.request.*;
+import com.easypay.cornucopiaallqrpay.dal.dao.impl.TPayOrderMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayChannel;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayOrder;
 import com.easypay.cornucopiaallqrpay.service.BaseService;
@@ -36,6 +37,9 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
 
     @Autowired
     private AlipayConfig alipayConfig;
+
+    @Autowired
+    private TPayOrderMapperImpl tPayOrderMapper;
 
     @Override
     public Map doAliPayWapReq(String jsonParam) {
@@ -342,8 +346,35 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         log.info("{}生成请求支付宝数据,req={}", logPrefix, alipay_request.getBizModel());
         log.info("###### 商户统一下单处理完成 ######");
         Map<String, Object> map = XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_SUCCESS, null);
-        map.put("payOrderId", payOrderId);
-        map.put("payUrl", payUrl);
+
+        map.put("payUrl", dealResult(payOrderId,payUrl));
         return RpcUtil.createBizResult(baseParam, map);
+    }
+    private String dealResult(String payOrderId,String payUrl){
+        JSONObject result = new JSONObject();
+
+        JSONObject jsonObject = JSONObject.parseObject(payUrl);
+        JSONObject  object =  jsonObject.getJSONObject("alipay_trade_pay_response");
+
+
+        TPayOrder tPayOrder = new TPayOrder();
+        tPayOrder.setPayOrderId(payOrderId);
+        tPayOrder.setRespCode(object.getString("code")+"-"+object.getString("sub_code"));
+        tPayOrder.setRespMsg(object.getString("sub_msg"));
+        tPayOrder.setChannelorderno(object.getString("out_trade_no"));
+
+        if("10000".equals(object.getString("code"))){
+            log.info("下单结果成功");
+            result.put("ordStatus","2");
+            tPayOrder.setStatus((byte)2);
+        }else {
+            log.info("下单结果失败");
+            result.put("ordStatus","9");
+            tPayOrder.setStatus((byte) 9);
+        }
+        result.put("payOrderId",payOrderId);
+        result.put("respMsg",object.getString("sub_msg"));
+        tPayOrderMapper.updateRespByPayOrderId(tPayOrder);
+        return result.toJSONString();
     }
 }

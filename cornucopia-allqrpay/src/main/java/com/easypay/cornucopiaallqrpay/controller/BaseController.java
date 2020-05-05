@@ -25,10 +25,7 @@ public class BaseController {
     @ResponseBody
     public CommonResult exception(HttpServletRequest request, HttpServletResponse response,Exception e){
         log.warn(e.getMessage());
-        BaseResponse baseResponse = new BaseResponse();
-        baseResponse.setRespCode(String.valueOf(ResultCode.CODE_998.getCode()));
-        baseResponse.setRespDesc(e.getMessage());
-        return CommonResult.success(JSONObject.toJSONString(baseResponse));
+        return CommonResult.failed(ResultCode.CODE_998,e.getMessage());
     }
 
     /**
@@ -40,9 +37,7 @@ public class BaseController {
     @ResponseBody
     public CommonResult serviceHandle(BindException e) {
         List<ObjectError> allErrors = e.getBindingResult().getAllErrors();
-        BaseResponse baseResponse = new BaseResponse();
-        baseResponse.setRespCode(String.valueOf(ResultCode.CODE_999.getCode()));
-        baseResponse.setRespDesc(allErrors.get(0).getDefaultMessage());
-        return CommonResult.success(JSONObject.toJSONString(baseResponse));
+
+        return CommonResult.failed(ResultCode.CODE_999,allErrors.get(0).getDefaultMessage());
     }
 }

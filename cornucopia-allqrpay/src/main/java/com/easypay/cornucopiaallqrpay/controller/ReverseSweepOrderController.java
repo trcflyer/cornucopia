@@ -148,7 +148,6 @@ public class ReverseSweepOrderController {
         if(orderMap == null){
             return CommonResult.failed(ResultCode.CODE_200);
         }
-        createOrderResponse.setPayOrderId(orderMap.get("payOrderId"));
         createOrderResponse.setMchId(mchId);
         createOrderResponse.setOrderInfo(orderMap.get("payUrl"));
         createOrderResponse.setMchOrderId(mchOrderId);

@@ -70,7 +70,7 @@ public class GoodsOrderController {
         paramMap.put("body", "聚合扫码支付");
         paramMap.put("param1", "");                         // 扩展参数1
         paramMap.put("param2", "");                         // 扩展参数2 ORD_ID_SQE
-        paramMap.put("mchOrderId", sequenceBiz.getSeqId("ORD_ID_SQE"));
+        paramMap.put("mchOrderId",  DateUtils.getCurrentTimeStrDefault().substring(0,8)+StringUtils.leftPad(sequenceBiz.getSeqId("ORD_ID_SQE"),12,"0"));
 
 
         JSONObject extra = new JSONObject();

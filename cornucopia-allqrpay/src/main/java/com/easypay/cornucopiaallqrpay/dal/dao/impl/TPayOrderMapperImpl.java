@@ -12,4 +12,6 @@ public interface TPayOrderMapperImpl extends TPayOrderMapper {
 
     TPayOrder selectMchOrderId(@Param("mchId") String mchId,@Param("mchOrderId") String mchOrderId);
 
+    int updateRespByPayOrderId(TPayOrder tPayOrder);
+
 }
