@@ -2,6 +2,7 @@ package com.easypay.cornucopiaallqrpay.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.easypay.cornucopiaallqrpay.dal.dao.impl.TPayOrderMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayChannel;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayOrder;
 import com.easypay.cornucopiaallqrpay.service.BaseService;
@@ -26,6 +27,7 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import com.github.binarywang.wxpay.util.SignUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -43,6 +45,8 @@ import java.util.Map;
 @Slf4j
 @Service
 public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel4WxService {
+    @Autowired
+    private TPayOrderMapperImpl tPayOrderMapper;
 
     @Resource
     private WxPayProperties wxPayProperties;
@@ -79,7 +83,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
                 map.put("payOrderId", payOrderId);
                 map.put("prepayId", wxPayUnifiedOrderResult.getPrepayId());
                 int result = super.baseUpdateStatus4Ing(payOrderId, wxPayUnifiedOrderResult.getPrepayId());
-                log.info("更新第三方支付订单号:payOrderId={},prepayId={},result={}", payOrderId, wxPayUnifiedOrderResult.getPrepayId(), result);
+                log.info("更新支付订单号:payOrderId={},prepayId={},result={}", payOrderId, wxPayUnifiedOrderResult.getPrepayId(), result);
                 switch (tradeType) {
                     case PayConstant.WxConstant.TRADE_TYPE_NATIVE : {
                         map.put("codeUrl", wxPayUnifiedOrderResult.getCodeURL());   // 二维码支付链接
@@ -203,9 +207,12 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
     }
 
     public Map doWxPayBarCodeReq(String jsonParam){
+        Map<String, Object> resultMap = new HashMap<String, Object>();
         String logPrefix = "【微信支付付款码支付】";
         BaseParam baseParam = JsonUtil.getObjectFromJson(jsonParam, BaseParam.class);
         Map<String, Object> bizParamMap = baseParam.getBizParamMap();
+        TPayOrder payOrder = null;
+        String  payUrl = null;
         try{
             if (ObjectValidUtil.isInvalid(bizParamMap)) {
                 log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_NOT_FOUND.getMessage(), jsonParam);
@@ -213,7 +220,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
             }
             JSONObject payOrderObj = baseParam.isNullValue("payOrder") ? null : JSONObject.parseObject(bizParamMap.get("payOrder").toString());
             String tradeType = baseParam.isNullValue("tradeType") ? null : bizParamMap.get("tradeType").toString();
-            TPayOrder payOrder = BeanConvertUtils.map2Bean(payOrderObj, TPayOrder.class);
+            payOrder = BeanConvertUtils.map2Bean(payOrderObj, TPayOrder.class);
             if (ObjectValidUtil.isInvalid(payOrder, tradeType)) {
                 log.warn("{}失败, {}. jsonParam={}", logPrefix, RetEnum.RET_PARAM_INVALID.getMessage(), jsonParam);
                 return RpcUtil.createFailResult(baseParam, RetEnum.RET_PARAM_INVALID);
@@ -234,7 +241,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
                 map.put("payOrderId", payOrderId);
                 map.put("prepayId", wxPayMicropayResult.getTransactionId());
                 int result = super.baseUpdateStatus4Ing(payOrderId, wxPayMicropayResult.getTransactionId());
-                log.info("更新第三方支付订单号:payOrderId={},微信订单号transaction_id={},result={}", payOrderId, wxPayMicropayResult.getTransactionId(), result);
+                log.info("更新支付订单号:payOrderId={},微信订单号transaction_id={},result={}", payOrderId, wxPayMicropayResult.getTransactionId(), result);
 
                 Map<String, String> payInfo = new HashMap<>();
                 String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
@@ -248,8 +255,9 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
                 payInfo.put("paySign", SignUtils.createSign(payInfo, wxPayConfig.getMchKey(), null));
                 map.put("payParams", payInfo);
 
+                resultMap = RpcUtil.createBizResult(baseParam, map);
+                 payUrl =  dealResult(payOrder.getPayOrderId(),String.valueOf(resultMap.get("result_code")),"成功",String.valueOf(resultMap.get("transaction_id")));
 
-                return RpcUtil.createBizResult(baseParam, map);
             } catch (WxPayException e) {
                 log.error(e.getMessage(), "下单失败");
                 //出现业务错误
@@ -257,16 +265,40 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
                 log.info("err_code:{}", e.getErrCode());
                 log.info("err_code_des:{}", e.getErrCodeDes());
 
-                return RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_WX_PAY_CREATE_FAIL);
-
-                // return XXPayUtil.makeRetData(XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_FAIL, "0111", "调用微信支付失败," + e.getErrCode() + ":" + e.getErrCodeDes()), resKey);
+                resultMap = RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_WX_PAY_CREATE_FAIL);
+                 payUrl =  dealResult(payOrder.getPayOrderId(),e.getErrCodeDes(),e.getResultCode()+"-"+e.getErrCode(),null);
             }
         }catch (Exception e) {
             log.error(e.getMessage(), "微信支付付款码支付异常");
-            return RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_WX_PAY_CREATE_FAIL);
+            resultMap = RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_WX_PAY_CREATE_FAIL);
+             payUrl = dealResult(payOrder.getPayOrderId(),"下单异常","FAIL",null);
 
-            //return XXPayUtil.makeRetFail(XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_FAIL, "", PayConstant.RETURN_VALUE_FAIL, PayEnum.ERR_0001));
         }
+        resultMap.put("payUrl",   payUrl );
+        return resultMap;
+    }
+    private String dealResult(String payOrderId,String respMsg,String result_code,String out_trade_no){
+        JSONObject result = new JSONObject();
+
+        TPayOrder tPayOrder = new TPayOrder();
+        tPayOrder.setPayOrderId(payOrderId);
+        tPayOrder.setRespCode(result_code);
+        tPayOrder.setRespMsg(respMsg);
+        tPayOrder.setChannelorderno(out_trade_no);
+
+        if("SUCCESS".equals(result_code)){
+            log.info("下单结果成功");
+            result.put("ordStatus","2");
+            tPayOrder.setStatus((byte)2);
+        }else {
+            log.info("下单结果失败");
+            result.put("ordStatus","9");
+            tPayOrder.setStatus((byte) 9);
+        }
+        result.put("payOrderId",payOrderId);
+        result.put("respMsg",respMsg);
+        tPayOrderMapper.updateRespByPayOrderId(tPayOrder);
+        return result.toJSONString();
     }
     /**
      * 构建微信统一下单请求数据
@@ -296,6 +328,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
         request.setTotalFee(totalFee);
         request.setSpbillCreateIp(spBillCreateIP);
         request.setGoodsTag(goodsTag);
+        request.setAuthCode(payOrder.getParam2());
         request.setLimitPay(limitPay);
 
         return request;

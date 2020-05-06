@@ -81,17 +81,20 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         paramMap.put("payOrder", payOrder);
         String jsonParam = RpcUtil.createBaseParam(paramMap);
         Map<String, Object> result= null;
-        if(tradeType.equals(PayConstant.PAY_CHANNEL_WX_BAR_CODE)){
+        if(tradeType.equals(PayConstant.WxConstant.TRADE_TYPE_BAR_CODE)){
             result = payChannel4WxService.doWxPayBarCodeReq(jsonParam);
         }else {
             result = payChannel4WxService.doWxPayReq(jsonParam);
         }
         String s = RpcUtil.mkRet(result);
         if(s == null) {
-            return XXPayUtil.makeRetData(XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_FAIL, "0111", "调用微信支付失败"), resKey);
+            Map<String, Object> map =XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_FAIL, "0111", "调用微信支付失败");
+            map.put("payUrl",   result.get("payUrl") );
+            return XXPayUtil.makeRetData(map, resKey);
         }
         Map<String, Object> map = XXPayUtil.makeRetMap(PayConstant.RETURN_VALUE_SUCCESS, "", PayConstant.RETURN_VALUE_SUCCESS, null);
         map.putAll((Map) result.get("bizResult"));
+        map.put("payUrl",   result.get("payUrl") );
         return XXPayUtil.makeRetData(map, resKey);
     }
 
