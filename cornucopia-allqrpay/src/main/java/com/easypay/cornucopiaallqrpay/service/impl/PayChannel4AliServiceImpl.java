@@ -359,7 +359,6 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
 
         TPayOrder tPayOrder = new TPayOrder();
         tPayOrder.setPayOrderId(payOrderId);
-        tPayOrder.setRespCode(object.getString("code")+"-"+object.getString("sub_code"));
         tPayOrder.setRespMsg(object.getString("sub_msg"));
         tPayOrder.setChannelorderno(object.getString("out_trade_no"));
 
@@ -367,10 +366,12 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
             log.info("下单结果成功");
             result.put("ordStatus","2");
             tPayOrder.setStatus((byte)2);
+            tPayOrder.setRespCode(object.getString("code"));
         }else {
             log.info("下单结果失败");
             result.put("ordStatus","9");
             tPayOrder.setStatus((byte) 9);
+            tPayOrder.setRespCode(object.getString("code")+"-"+object.getString("sub_code"));
         }
         result.put("payOrderId",payOrderId);
         result.put("respMsg",object.getString("sub_msg"));

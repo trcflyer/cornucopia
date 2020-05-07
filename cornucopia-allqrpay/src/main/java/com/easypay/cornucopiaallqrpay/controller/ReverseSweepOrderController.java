@@ -146,12 +146,22 @@ public class ReverseSweepOrderController {
 
         orderMap = createPayOrder(ordAmt, params, mchId);
         if(orderMap == null){
-            return CommonResult.failed(ResultCode.CODE_200);
+            return CommonResult.failed(ResultCode.CODE_202);
         }
+        JSONObject jsonObject = JSONObject.parseObject(orderMap.get("payUrl"));
         createOrderResponse.setMchId(mchId);
         createOrderResponse.setOrderInfo(orderMap.get("payUrl"));
         createOrderResponse.setMchOrderId(mchOrderId);
-        return CommonResult.success(JSONObject.toJSONString(createOrderResponse));
+        if ("2".equals(jsonObject.getString("ordStatus"))){
+            return CommonResult.success(JSONObject.toJSONString(createOrderResponse));
+        }else if ("9".equals(jsonObject.getString("ordStatus"))){
+            return CommonResult.failed(ResultCode.CODE_202.getCode(),ResultCode.CODE_202.getMessage(),JSONObject.toJSONString(createOrderResponse));
+        }else if ("1".equals(jsonObject.getString("ordStatus"))){
+            return CommonResult.failed(ResultCode.CODE_203.getCode(),ResultCode.CODE_203.getMessage(),JSONObject.toJSONString(createOrderResponse));
+        }else {
+            return CommonResult.failed(ResultCode.CODE_202);
+        }
+
     }
 
 }

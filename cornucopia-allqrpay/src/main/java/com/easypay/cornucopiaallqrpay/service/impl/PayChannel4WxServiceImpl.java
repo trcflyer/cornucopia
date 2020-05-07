@@ -256,7 +256,11 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
                 map.put("payParams", payInfo);
 
                 resultMap = RpcUtil.createBizResult(baseParam, map);
-                 payUrl =  dealResult(payOrder.getPayOrderId(),String.valueOf(resultMap.get("result_code")),"成功",String.valueOf(resultMap.get("transaction_id")));
+
+                Map<String, Object> mapTemp = new HashMap<>();
+                mapTemp.putAll((Map) resultMap.get("bizResult"));
+                log.info("支付结果,resultMap:{}",resultMap);
+                 payUrl =  dealResult(payOrder.getPayOrderId(),"成功","SUCCESS",String.valueOf(mapTemp.get("prepayId")));
 
             } catch (WxPayException e) {
                 log.error(e.getMessage(), "下单失败");
@@ -266,7 +270,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
                 log.info("err_code_des:{}", e.getErrCodeDes());
 
                 resultMap = RpcUtil.createFailResult(baseParam, RetEnum.RET_BIZ_WX_PAY_CREATE_FAIL);
-                 payUrl =  dealResult(payOrder.getPayOrderId(),e.getErrCodeDes(),e.getResultCode()+"-"+e.getErrCode(),null);
+                 payUrl =  dealResult(payOrder.getPayOrderId(),e.getErrCodeDes(),e.getErrCode(),null);
             }
         }catch (Exception e) {
             log.error(e.getMessage(), "微信支付付款码支付异常");
@@ -290,6 +294,10 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
             log.info("下单结果成功");
             result.put("ordStatus","2");
             tPayOrder.setStatus((byte)2);
+        }if("USERPAYING".equals(result_code)){
+            log.info("需要用户输入支付密码");
+            result.put("ordStatus","1");
+            tPayOrder.setStatus((byte)1);
         }else {
             log.info("下单结果失败");
             result.put("ordStatus","9");
