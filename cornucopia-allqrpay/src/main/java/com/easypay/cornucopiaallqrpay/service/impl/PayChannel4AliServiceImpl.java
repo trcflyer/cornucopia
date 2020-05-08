@@ -1,5 +1,6 @@
 package com.easypay.cornucopiaallqrpay.service.impl;
 
+import cn.hutool.core.util.ReUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
@@ -311,7 +312,16 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         model.setSubject(payOrder.getSubject());
         model.setTotalAmount(AmountUtil.convertCent2Dollar(payOrder.getAmount().toString()));
         model.setBody(payOrder.getBody());
-        model.setScene(payOrder.getParam1());
+
+        String scene = payOrder.getParam1();
+        if ("security_code".equals(scene)){
+            //先判断是不是security_code，不是的话，就送sence=barcode,,
+            // 是的话，再判断authCode的值，是纯数字的话就送sence=barcode，是数字字母混合的话就送sence=security_code
+            if (ReUtil.isMatch("^\\d{1,}$",payOrder.getParam2())){
+                scene = "bar_code";
+            }
+        }
+        model.setScene(scene);
         model.setAuthCode(payOrder.getParam2());
         // 获取objParams参数
         String objParams = payOrder.getExtra();

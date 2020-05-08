@@ -114,7 +114,6 @@ public class QueryPayOrderController {
         }
 
         // 查询商户信息
-
         ResultCode respCode = checkMerIdBiz.checkMer(mchId);
         if (!ResultCode.SUCCESS.equals(respCode)) {
             errorMessage = "商户号错误";
@@ -124,4 +123,75 @@ public class QueryPayOrderController {
         return "success";
     }
 
+
+    /**
+     * 查询支付订单接口:
+     * 1)先验证接口参数以及签名信息
+     * 2)根据参数查询订单
+     * 3)返回订单数据
+     * @param request
+     * @param response
+     * @return
+     */
+
+    @RequestMapping(value = "/pay/orderList")
+    public CommonResult queryPayOrderList(HttpServletRequest request, HttpServletResponse response) {
+        log.info("###### 开始接收商户查询支付订单列表请求 ######");
+        String logPrefix = "【商户支付订单列表查询】";
+        try {
+            JSONObject payContext = new JSONObject();
+            // 验证参数有效性
+            String errorMessage = validateParamsList(request, payContext);
+            if (!"success".equalsIgnoreCase(errorMessage)) {
+                log.warn(errorMessage);
+                return CommonResult.failed(ResultCode.CODE_999,"必填参数不可为空");
+            }
+            log.debug("请求参数及签名校验通过");
+            String mchId = request.getParameter("mchId"); 			    // 商户ID
+            String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
+            JSONObject orderInfo = payOrderService.queryPayOrderList(mchId, deviceSn);
+            log.info("{}查询支付订单,结果:{}", logPrefix, orderInfo);
+            if (orderInfo == null) {
+                return CommonResult.failed(ResultCode.CODE_999,"支付订单不存在");
+            }
+            log.info("###### 商户查询订单处理完成 ######");
+            Map<String,String> mapResult = new HashMap<>();
+            mapResult.put("mchId",mchId);
+            mapResult.put("orderInfo",orderInfo.toJSONString());
+            return CommonResult.success(JSONObject.toJSONString(mapResult));
+        }catch (Exception e) {
+            log.error(e.getMessage(), "");
+            return CommonResult.failed(ResultCode.CODE_998,"支付系统异常");
+        }
+    }
+
+    /**
+     * 验证创建订单请求参数,参数通过返回JSONObject对象,否则返回错误文本信息
+     * @param request
+     * @return
+     */
+    private String validateParamsList(HttpServletRequest request, JSONObject payContext) {
+        // 验证请求参数,参数有问题返回错误提示
+        String errorMessage;
+        // 支付参数
+        String mchId = request.getParameter("mchId"); 			    // 商户ID
+        String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
+
+        // 验证请求参数有效性（必选项）
+        if(StringUtils.isBlank(mchId)) {
+            errorMessage = "request params[mchId] error.";
+            return errorMessage;
+        }
+        if(StringUtils.isBlank(deviceSn)) {
+            errorMessage = "request params[deviceSn] error.";
+            return errorMessage;
+        }
+        // 查询商户信息
+        ResultCode respCode = checkMerIdBiz.checkMer(mchId);
+        if (!ResultCode.SUCCESS.equals(respCode)) {
+            errorMessage = "商户号错误";
+            return errorMessage;
+        }
+        return "success";
+    }
 }

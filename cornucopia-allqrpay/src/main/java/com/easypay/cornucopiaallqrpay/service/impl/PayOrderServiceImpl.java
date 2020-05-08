@@ -74,6 +74,11 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         }
         return payOrder;
     }
+    public JSONObject queryPayOrderList(String mchId,String deviceSn){
+        JSONObject orderInfo = JSONObject.parseObject("");
+
+        return orderInfo;
+    }
 
     public String doWxPayReq(String tradeType, JSONObject payOrder, String resKey) {
         Map<String,Object> paramMap = new HashMap<>();

@@ -31,6 +31,8 @@ public interface IPayOrderService {
 
     JSONObject queryPayOrder(String mchId,String deviceSn, String payOrderId, String mchOrderId, String executeNotify);
 
+    JSONObject queryPayOrderList(String mchId,String deviceSn);
+
     String doWxPayReq(String tradeType, JSONObject payOrder, String resKey);
 
     String doAliPayReq(String channelId, JSONObject payOrder, String resKey);
