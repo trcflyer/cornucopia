@@ -294,7 +294,7 @@ public class PayChannel4WxServiceImpl extends BaseService implements IPayChannel
             log.info("下单结果成功");
             result.put("ordStatus","2");
             tPayOrder.setStatus((byte)2);
-        }if("USERPAYING".equals(result_code)){
+        }else if("USERPAYING".equals(result_code)){
             log.info("需要用户输入支付密码");
             result.put("ordStatus","1");
             tPayOrder.setStatus((byte)1);
