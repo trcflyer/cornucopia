@@ -42,9 +42,17 @@
             <if test="respMsg != null">
                 resp_Msg = #{respMsg,jdbcType=VARCHAR},
             </if>
-
-
         </set>
         where   Pay_Order_Id = #{payOrderId,jdbcType=VARCHAR}
     </update>
+
+    <select id="selectMchOrderIdList" resultMap="com.easypay.cornucopiaallqrpay.dal.dao.TPayOrderMapper.BaseResultMap"
+    >
+        select
+        <include refid="com.easypay.cornucopiaallqrpay.dal.dao.TPayOrderMapper.Base_Column_List" />
+        from t_pay_order
+        where Mch_Id = #{mchId}
+        and device_Sn = #{deviceSn}
+        order by CreateTime desc
+    </select>
 </mapper>

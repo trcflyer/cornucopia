@@ -1,8 +1,10 @@
 package com.easypay.cornucopiaallqrpay.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.easypay.cornucopiaallqrpay.biz.CheckMerIdBiz;
 import com.easypay.cornucopiaallqrpay.service.IPayOrderService;
+import com.easypay.cornucopiaallqrpay.util.MyChannelUtil;
 import com.easypay.cornucopiacommon.constant.PayConstant;
 import com.easypay.cornucopiacommon.result.CommonResult;
 import com.easypay.cornucopiacommon.result.ResultCode;
@@ -77,7 +79,7 @@ public class QueryPayOrderController {
             mapResult.put("payOrderId",payOrder.getString("payOrderId"));
             mapResult.put("ordAmt",AmountUtil.convertCent2Dollar(String.valueOf(payOrder.get("amount"))));
             mapResult.put("ordStatus",payOrder.getString("status"));
-            mapResult.put("channelId",PayConstant.PAY_CHANNEL_ALIPAY_BAR_CODE.equals(payOrder.getString("channelId"))?"支付宝支付":"微信支付");
+            mapResult.put("channelId", MyChannelUtil.getChannelName(payOrder.getString("channelId")));
             return CommonResult.success(JSONObject.toJSONString(mapResult));
         }catch (Exception e) {
             log.error(e.getMessage(), "");
@@ -149,12 +151,13 @@ public class QueryPayOrderController {
             log.debug("请求参数及签名校验通过");
             String mchId = request.getParameter("mchId"); 			    // 商户ID
             String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
-            JSONObject orderInfo = payOrderService.queryPayOrderList(mchId, deviceSn);
+            String pageNum = request.getParameter("pageNum");
+            String pageSize = request.getParameter("pageSize");
+            JSONArray orderInfo = payOrderService.queryPayOrderList(mchId, deviceSn,pageNum,pageSize);
             log.info("{}查询支付订单,结果:{}", logPrefix, orderInfo);
             if (orderInfo == null) {
-                return CommonResult.failed(ResultCode.CODE_999,"支付订单不存在");
+                return CommonResult.failed(ResultCode.CODE_999,"支付订单列表为空");
             }
-            log.info("###### 商户查询订单处理完成 ######");
             Map<String,String> mapResult = new HashMap<>();
             mapResult.put("mchId",mchId);
             mapResult.put("orderInfo",orderInfo.toJSONString());
@@ -176,6 +179,9 @@ public class QueryPayOrderController {
         // 支付参数
         String mchId = request.getParameter("mchId"); 			    // 商户ID
         String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
+        String pageNum = request.getParameter("pageNum");
+        String pageSize = request.getParameter("pageSize");
+
 
         // 验证请求参数有效性（必选项）
         if(StringUtils.isBlank(mchId)) {
@@ -186,6 +192,10 @@ public class QueryPayOrderController {
             errorMessage = "request params[deviceSn] error.";
             return errorMessage;
         }
+        if(StringUtils.isBlank(pageNum)||StringUtils.isBlank(pageSize)) {
+            return "分页查询参数不可为空";
+        }
+
         // 查询商户信息
         ResultCode respCode = checkMerIdBiz.checkMer(mchId);
         if (!ResultCode.SUCCESS.equals(respCode)) {

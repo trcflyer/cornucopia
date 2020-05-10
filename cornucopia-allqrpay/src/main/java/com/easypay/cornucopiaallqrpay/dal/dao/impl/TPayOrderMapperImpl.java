@@ -5,6 +5,8 @@ import com.easypay.cornucopiaallqrpay.dal.pojo.TPayOrder;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TPayOrderMapperImpl extends TPayOrderMapper {
 
@@ -13,5 +15,8 @@ public interface TPayOrderMapperImpl extends TPayOrderMapper {
     TPayOrder selectMchOrderId(@Param("mchId") String mchId,@Param("mchOrderId") String mchOrderId);
 
     int updateRespByPayOrderId(TPayOrder tPayOrder);
+
+    List<TPayOrder> selectMchOrderIdList(@Param("mchId") String mchId, @Param("deviceSn") String deviceSn);
+
 
 }

@@ -1,5 +1,6 @@
 package com.easypay.cornucopiaallqrpay.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Map;
@@ -31,7 +32,7 @@ public interface IPayOrderService {
 
     JSONObject queryPayOrder(String mchId,String deviceSn, String payOrderId, String mchOrderId, String executeNotify);
 
-    JSONObject queryPayOrderList(String mchId,String deviceSn);
+    JSONArray queryPayOrderList(String mchId, String deviceSn, String pageNum, String pageSize);
 
     String doWxPayReq(String tradeType, JSONObject payOrder, String resKey);
 

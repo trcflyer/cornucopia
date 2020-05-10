@@ -1,18 +1,26 @@
 package com.easypay.cornucopiaallqrpay.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.easypay.cornucopiaallqrpay.dal.dao.impl.TPayOrderMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayOrder;
 import com.easypay.cornucopiaallqrpay.service.*;
+import com.easypay.cornucopiaallqrpay.util.MyChannelUtil;
 import com.easypay.cornucopiacommon.constant.PayConstant;
 import com.easypay.cornucopiacommon.domain.BaseParam;
 import com.easypay.cornucopiacommon.enums.RetEnum;
 import com.easypay.cornucopiacommon.utils.*;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.omg.CORBA.INTERNAL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +41,9 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
 
     @Autowired
     private IPayChannel4AliService payChannel4AliService;
+
+    @Autowired
+    private TPayOrderMapperImpl tPayOrderMapper;
 
     public int createPayOrder(JSONObject payOrder) {
         Map<String,Object> paramMap = new HashMap<>();
@@ -74,10 +85,31 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         }
         return payOrder;
     }
-    public JSONObject queryPayOrderList(String mchId,String deviceSn){
-        JSONObject orderInfo = JSONObject.parseObject("");
+    public JSONArray queryPayOrderList(String mchId,String deviceSn,String pageNum,String pageSize){
+        try {
+            Page<TPayOrder> page = PageHelper.startPage(Integer.valueOf(pageNum), Integer.valueOf(pageSize ));
+            List<TPayOrder> list = tPayOrderMapper.selectMchOrderIdList(mchId,deviceSn);
+            log.info("总共有:{}条数据,实际返回:{}两条数据!",page.getTotal(),list.size());
+            JSONArray jsonArray = new JSONArray();
+            for (TPayOrder tPayOrder : page.getResult()) {
+                JSONObject  jsonObject = new JSONObject();
+                jsonObject.put("payOrderId",tPayOrder.getPayOrderId());
+                jsonObject.put("ordStatus",tPayOrder.getStatus());
+                jsonObject.put("mchId",tPayOrder.getMchId());
+                jsonObject.put("mchOrderId",tPayOrder.getMchOrderId());
+                jsonObject.put("ordAmt",AmountUtil.convertCent2Dollar(String.valueOf(tPayOrder.getAmount())));
+                jsonObject.put("deviceSn",tPayOrder.getDeviceSn());
+                jsonObject.put("channelId", MyChannelUtil.getChannelName(tPayOrder.getChannelId()));
+                jsonObject.put("transDate",tPayOrder.getTransDate());
+                jsonObject.put("transTime",tPayOrder.getCreatetime());
 
-        return orderInfo;
+                jsonArray.add(jsonObject);
+            }
+            return jsonArray;
+        } catch (Exception e) {
+            log.error("查询订单列表失败!原因是:{}",e);
+        }
+        return null;
     }
 
     public String doWxPayReq(String tradeType, JSONObject payOrder, String resKey) {
