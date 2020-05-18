@@ -71,6 +71,10 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         model.setTotalAmount(AmountUtil.convertCent2Dollar(payOrder.getAmount().toString()));
         model.setBody(payOrder.getBody());
         model.setProductCode("QUICK_WAP_PAY");
+        alipay_request.putOtherTextParam("app_auth_token", payChannel.getAliAppAuthToken());
+
+
+
         // 获取objParams参数
         String objParams = payOrder.getExtra();
         if (StringUtils.isNotEmpty(objParams)) {
@@ -268,6 +272,7 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
                 log.error("{}objParams参数格式错误！", logPrefix);
             }
         }
+        alipay_request.putOtherTextParam("app_auth_token", payChannel.getAliAppAuthToken());
         alipay_request.setBizModel(model);
         // 设置异步通知地址
         alipay_request.setNotifyUrl(alipayConfig.getNotify_url());
@@ -318,6 +323,7 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         model.setTotalAmount(AmountUtil.convertCent2Dollar(payOrder.getAmount().toString()));
         model.setBody(payOrder.getBody());
 
+
         String scene = payOrder.getParam1();
         if ("security_code".equals(scene)){
             //先判断是不是security_code，不是的话，就送sence=barcode,,
@@ -358,6 +364,7 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         String payUrl = null;
         try {
             payUrl = client.execute(alipay_request).getBody();
+
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }

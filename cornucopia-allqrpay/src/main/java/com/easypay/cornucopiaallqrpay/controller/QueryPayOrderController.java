@@ -153,7 +153,10 @@ public class QueryPayOrderController {
             String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
             String pageNum = request.getParameter("pageNum");
             String pageSize = request.getParameter("pageSize");
-            JSONArray orderInfo = payOrderService.queryPayOrderList(mchId, deviceSn,pageNum,pageSize);
+            String transDate = request.getParameter("transDate");
+            String scene = request.getParameter("scene");
+
+            JSONObject orderInfo = payOrderService.queryPayOrderList(mchId, deviceSn,pageNum,pageSize,transDate,scene);
             log.info("{}查询支付订单,结果:{}", logPrefix, orderInfo);
             if (orderInfo == null) {
                 return CommonResult.failed(ResultCode.CODE_999,"支付订单列表为空");
@@ -178,9 +181,9 @@ public class QueryPayOrderController {
         String errorMessage;
         // 支付参数
         String mchId = request.getParameter("mchId"); 			    // 商户ID
-        String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
         String pageNum = request.getParameter("pageNum");
         String pageSize = request.getParameter("pageSize");
+        String transDate = request.getParameter("transDate");
 
 
         // 验证请求参数有效性（必选项）
@@ -188,8 +191,8 @@ public class QueryPayOrderController {
             errorMessage = "request params[mchId] error.";
             return errorMessage;
         }
-        if(StringUtils.isBlank(deviceSn)) {
-            errorMessage = "request params[deviceSn] error.";
+        if(StringUtils.isBlank(transDate)) {
+            errorMessage = "request params[transDate] error.";
             return errorMessage;
         }
         if(StringUtils.isBlank(pageNum)||StringUtils.isBlank(pageSize)) {

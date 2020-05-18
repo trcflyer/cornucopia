@@ -123,12 +123,8 @@ public class GoodsOrderController {
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
         try {
-            HashMap<String,String> map = new HashMap<String,String>(2);
-            map.put("mchId", mchId);
-            map.put("key", tMchInfo.getRandomKey());
-
             model.put("baseUrl", defaultRequestValue.getBaseUrl());
-            model.put("value", EncryptUtil.encrypt(RSAEncryptUtil.sign(map, privatekey)).getCipherText());
+            model.put("value", EncryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText());
             model.put("mchId", mchId);
         } catch (Exception e) {
             log.info("签名异常");
@@ -161,15 +157,15 @@ public class GoodsOrderController {
 
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
         try {
-            HashMap mapSign = new HashMap(2);
-            mapSign.put("mchId", mchId);
-            mapSign.put("key", tMchInfo.getRandomKey());
-            boolean checkRestlt = RSAEncryptUtil.verify(mapSign, publickey, EncryptUtil.decrypt(value).getPlainText());
-            if (!checkRestlt) {
+            String  checkValue = EncryptUtil.encrypt(mchId+tMchInfo.getRandomKey()).getCipherText();
+            if (!checkValue.equals(value) ) {
                 log.info("验签失败");
                 model.put("dealMessage", "数据不合法");
                 return "dealMessage";
             }
+
+            HashMap mapSign = new HashMap(2);
+            mapSign.put("mchId", mchId);
             mapSign.put("key", RandomStrUtils.getInstance().getRandomString());
 
             model.put("mchId", mchId);
@@ -224,7 +220,7 @@ public class GoodsOrderController {
         String goodsId = "10001";
         log.info("{}接收参数:goodsId={},amount={},ua={}", logPrefix, goodsId, payAmt, ua);
         String client = "alipay";
-        String channelId = "ALIPAY_WAP";
+        String channelId = "ALIPAY_QR";
         if (StringUtils.isBlank(ua)) {
             String errorMessage = "User-Agent为空！";
             log.info("{}信息：{}", logPrefix, errorMessage);
@@ -234,7 +230,7 @@ public class GoodsOrderController {
         } else {
             if (ua.contains("Alipay")) {
                 client = "alipay";
-                channelId = "ALIPAY_WAP";
+                channelId = "ALIPAY_QR";
             } else if (ua.contains("MicroMessenger")) {
                 client = "wx";
                 channelId = "WX_JSAPI";
@@ -295,6 +291,15 @@ public class GoodsOrderController {
         model.put("payAmt", payAmt);
         if (orderMap != null) {
             model.put("orderMap", orderMap);
+            if(null != orderMap.get("payUrl")){
+               JSONObject jsonObject = JSONObject.parseObject(orderMap.get("payUrl"));
+                JSONObject alipay_trade_precreate_response = jsonObject.getJSONObject("alipay_trade_precreate_response");
+                if(alipay_trade_precreate_response != null){
+                    String qr_code = alipay_trade_precreate_response.getString("qr_code");
+                    model.put("qr_code", qr_code);
+                }
+            }
+
         }
         TMchInfo tMchInfo = tMchInfoMapper.selectByMchId(mchId);
         model.put("mchName", tMchInfo.getName());

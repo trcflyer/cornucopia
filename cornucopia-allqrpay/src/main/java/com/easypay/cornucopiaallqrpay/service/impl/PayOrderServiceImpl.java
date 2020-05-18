@@ -85,10 +85,18 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         }
         return payOrder;
     }
-    public JSONArray queryPayOrderList(String mchId,String deviceSn,String pageNum,String pageSize){
+    public JSONObject queryPayOrderList(String mchId,String deviceSn,String pageNum,String pageSize,String transDate, String scene){
         try {
+            JSONObject jsonObjectRe = new JSONObject();
             Page<TPayOrder> page = PageHelper.startPage(Integer.valueOf(pageNum), Integer.valueOf(pageSize ));
-            List<TPayOrder> list = tPayOrderMapper.selectMchOrderIdList(mchId,deviceSn);
+
+            TPayOrder query = new TPayOrder();
+            query.setMchId(mchId);
+            query.setDeviceSn(deviceSn);
+            query.setTransDate(transDate);
+            query.setParam1(scene);
+            List<TPayOrder> list = tPayOrderMapper.selectMchOrderIdList(query);
+            Long amt = tPayOrderMapper.selectMchTotalAmt(query);
             log.info("总共有:{}条数据,实际返回:{}两条数据!",page.getTotal(),list.size());
             JSONArray jsonArray = new JSONArray();
             for (TPayOrder tPayOrder : page.getResult()) {
@@ -99,13 +107,14 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
                 jsonObject.put("mchOrderId",tPayOrder.getMchOrderId());
                 jsonObject.put("ordAmt",AmountUtil.convertCent2Dollar(String.valueOf(tPayOrder.getAmount())));
                 jsonObject.put("deviceSn",tPayOrder.getDeviceSn());
-                jsonObject.put("channelId", MyChannelUtil.getChannelName(tPayOrder.getChannelId()));
+                jsonObject.put("channelId", MyChannelUtil.getSceneName(tPayOrder.getChannelId()));
                 jsonObject.put("transDate",tPayOrder.getTransDate());
                 jsonObject.put("transTime",tPayOrder.getCreatetime());
-
                 jsonArray.add(jsonObject);
             }
-            return jsonArray;
+            jsonObjectRe.put("totalAmt",AmountUtil.convertCent2Dollar(String.valueOf(amt)));
+            jsonObjectRe.put("totalNum",String.valueOf(page.getTotal()));
+            return jsonObjectRe;
         } catch (Exception e) {
             log.error("查询订单列表失败!原因是:{}",e);
         }

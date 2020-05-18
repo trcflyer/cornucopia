@@ -42,7 +42,9 @@
     </table>
 </div>
     <#if (client == 'alipay')>
-    ${orderMap.payUrl}
+        <script type="text/javascript">
+            window.location.href="${qr_code}";
+        </script>
     </#if>
     <#if (client == 'wx')>
     <script>

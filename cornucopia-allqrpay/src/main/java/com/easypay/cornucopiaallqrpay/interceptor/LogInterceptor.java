@@ -1,6 +1,7 @@
 package com.easypay.cornucopiaallqrpay.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,8 +19,13 @@ public class LogInterceptor implements HandlerInterceptor {
     private final static String TRACEID = "traceId";
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        MDC.put(TRACEID, UUID.randomUUID().toString().replace("-",""));
+        String traceId = request.getParameter(TRACEID);
+        if(StringUtils.isBlank(traceId)){
+            traceId = UUID.randomUUID().toString().replace("-","");
+        }
+        MDC.put(TRACEID, traceId);
         getRequestIp(request);
+        request.setAttribute(TRACEID, traceId);
         Map<String, String> requestMap = getAllRequestParam(request);
         log.info("请求地址为:{},请求参数为:{}",request.getRequestURI(),requestMap);
         return true;
