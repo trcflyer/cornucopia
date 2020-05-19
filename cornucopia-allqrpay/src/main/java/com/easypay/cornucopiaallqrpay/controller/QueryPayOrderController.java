@@ -79,7 +79,7 @@ public class QueryPayOrderController {
             mapResult.put("payOrderId",payOrder.getString("payOrderId"));
             mapResult.put("ordAmt",AmountUtil.convertCent2Dollar(String.valueOf(payOrder.get("amount"))));
             mapResult.put("ordStatus",payOrder.getString("status"));
-            mapResult.put("channelId", MyChannelUtil.getChannelName(payOrder.getString("channelId")));
+            mapResult.put("scene", MyChannelUtil.getSceneName(payOrder.getString("param1")));
             return CommonResult.success(JSONObject.toJSONString(mapResult));
         }catch (Exception e) {
             log.error(e.getMessage(), "");
@@ -163,7 +163,7 @@ public class QueryPayOrderController {
             }
             Map<String,String> mapResult = new HashMap<>();
             mapResult.put("mchId",mchId);
-            mapResult.put("orderInfo",orderInfo.toJSONString());
+            mapResult.putAll(JSONObject.parseObject(orderInfo.toJSONString(),HashMap.class));
             return CommonResult.success(JSONObject.toJSONString(mapResult));
         }catch (Exception e) {
             log.error(e.getMessage(), "");

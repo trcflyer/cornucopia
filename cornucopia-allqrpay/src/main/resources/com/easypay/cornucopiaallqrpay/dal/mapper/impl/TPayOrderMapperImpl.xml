@@ -52,39 +52,39 @@
         <include refid="com.easypay.cornucopiaallqrpay.dal.dao.TPayOrderMapper.Base_Column_List" />
         from t_pay_order
         <where>
-            <if test="mchId != null">
-                and  Mch_Id = #{mchId,jdbcType=VARCHAR},
-            </if>
-            <if test="device_Sn != null">
-                and  device_Sn = #{deviceSn,jdbcType=VARCHAR},
+            <if test="transDate != null">
+                and  trans_date = #{transDate,jdbcType=VARCHAR}
             </if>
             <if test="mchId != null">
-                and  trans_date = #{transDate,jdbcType=VARCHAR},
+                and  Mch_Id = #{mchId,jdbcType=VARCHAR}
             </if>
-            <if test="mchId != null">
-                and  Param1 = #{param1,jdbcType=VARCHAR},
+            <if test="deviceSn != null">
+                and  device_Sn = #{deviceSn,jdbcType=VARCHAR}
+            </if>
+            <if test="param1 != null">
+                and  Param1 = #{param1,jdbcType=VARCHAR}
             </if>
         </where>
         order by CreateTime desc
     </select>
 
-    <select id="selectMchTotalAmt" resultMap="com.easypay.cornucopiaallqrpay.dal.dao.TPayOrderMapper.BaseResultMap"
+    <select id="selectMchTotalAmt" resultType="java.lang.Long"
     >
         select
         sum(Amount)
         from t_pay_order
         <where>
-            <if test="mchId != null">
-                and  Mch_Id = #{mchId,jdbcType=VARCHAR},
-            </if>
-            <if test="device_Sn != null">
-                and  device_Sn = #{deviceSn,jdbcType=VARCHAR},
+            <if test="transDate != null">
+                and  trans_date = #{transDate,jdbcType=VARCHAR}
             </if>
             <if test="mchId != null">
-                and  trans_date = #{transDate,jdbcType=VARCHAR},
+                and  Mch_Id = #{mchId,jdbcType=VARCHAR}
             </if>
-            <if test="mchId != null">
-                and  Param1 = #{param1,jdbcType=VARCHAR},
+            <if test="deviceSn != null">
+                and  device_Sn = #{deviceSn,jdbcType=VARCHAR}
+            </if>
+            <if test="param1 != null">
+                and  Param1 = #{param1,jdbcType=VARCHAR}
             </if>
         </where>
     </select>

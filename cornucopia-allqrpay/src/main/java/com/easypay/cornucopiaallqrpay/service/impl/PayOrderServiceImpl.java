@@ -107,11 +107,12 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
                 jsonObject.put("mchOrderId",tPayOrder.getMchOrderId());
                 jsonObject.put("ordAmt",AmountUtil.convertCent2Dollar(String.valueOf(tPayOrder.getAmount())));
                 jsonObject.put("deviceSn",tPayOrder.getDeviceSn());
-                jsonObject.put("channelId", MyChannelUtil.getSceneName(tPayOrder.getChannelId()));
+                jsonObject.put("scene", MyChannelUtil.getSceneName(tPayOrder.getParam1()));
                 jsonObject.put("transDate",tPayOrder.getTransDate());
                 jsonObject.put("transTime",tPayOrder.getCreatetime());
                 jsonArray.add(jsonObject);
             }
+            jsonObjectRe.put("orderList",jsonArray.toJSONString());
             jsonObjectRe.put("totalAmt",AmountUtil.convertCent2Dollar(String.valueOf(amt)));
             jsonObjectRe.put("totalNum",String.valueOf(page.getTotal()));
             return jsonObjectRe;
