@@ -1,7 +1,10 @@
 package com.easypay.cornucopiaallqrpay.service.impl;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.easypay.cornucopiaallqrpay.bean.PayOrderQueryBean;
 import com.easypay.cornucopiaallqrpay.dal.dao.impl.TPayOrderMapperImpl;
 import com.easypay.cornucopiaallqrpay.dal.pojo.TPayOrder;
 import com.easypay.cornucopiaallqrpay.service.*;
@@ -85,15 +88,56 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
         }
         return payOrder;
     }
-    public JSONObject queryPayOrderList(String mchId,String deviceSn,String pageNum,String pageSize,String transDate, String scene){
+    public JSONObject queryPayOrderStatistics(String mchId, String deviceSn,String startDate,String endDate){
+        try {
+            JSONObject jsonObjectRe = new JSONObject();
+            PayOrderQueryBean query = new PayOrderQueryBean();
+            query.setMchId(mchId);
+            query.setDevice("BAR");
+            query.setDeviceSn(deviceSn);
+            query.setStartDate(startDate);
+            query.setEndDate(endDate);
+
+            Long totalAmt = tPayOrderMapper.selectMchTotalAmt(query);
+            Long totalNum =  tPayOrderMapper.selectMchTotalNum(query);
+            jsonObjectRe.put("totalAmt",AmountUtil.convertCent2Dollar(String.valueOf(totalAmt)));
+            jsonObjectRe.put("totalNum",String.valueOf(totalNum));
+
+            query.setParam1("bar_code");//支付宝条码
+            Long barCodeTalAmt = tPayOrderMapper.selectMchTotalAmt(query);
+            Long barCodeTotalNum =  tPayOrderMapper.selectMchTotalNum(query);
+            jsonObjectRe.put("barCodeTalAmt",AmountUtil.convertCent2Dollar(String.valueOf(barCodeTalAmt)));
+            jsonObjectRe.put("barCodeTotalNum",String.valueOf(barCodeTotalNum));
+
+            query.setParam1("security_code");//支付宝刷脸付
+            Long securityCodeTalAmt = tPayOrderMapper.selectMchTotalAmt(query);
+            Long securityTotalNum =  tPayOrderMapper.selectMchTotalNum(query);
+            jsonObjectRe.put("securityCodeTalAmt",AmountUtil.convertCent2Dollar(String.valueOf(securityCodeTalAmt)));
+            jsonObjectRe.put("securityTotalNum",String.valueOf(securityTotalNum));
+
+            query.setParam1("bar_code_w");//微信条码
+            Long barCodeWTalAmt = tPayOrderMapper.selectMchTotalAmt(query);
+            Long barCodeWTotalNum =  tPayOrderMapper.selectMchTotalNum(query);
+            jsonObjectRe.put("barCodeWTalAmt",AmountUtil.convertCent2Dollar(String.valueOf(barCodeWTalAmt)));
+            jsonObjectRe.put("barCodeWTotalNum",String.valueOf(barCodeWTotalNum));
+
+            return jsonObjectRe;
+        } catch (Exception e) {
+            log.error("查询订单列表失败!原因是:{}",e);
+        }
+        return null;
+    }
+    public JSONObject queryPayOrderList(String mchId,String deviceSn,String pageNum,String pageSize,String startDate,String endDate, String scene){
         try {
             JSONObject jsonObjectRe = new JSONObject();
             Page<TPayOrder> page = PageHelper.startPage(Integer.valueOf(pageNum), Integer.valueOf(pageSize ));
 
-            TPayOrder query = new TPayOrder();
+            PayOrderQueryBean query = new PayOrderQueryBean();
             query.setMchId(mchId);
+            query.setDevice("BAR");
             query.setDeviceSn(deviceSn);
-            query.setTransDate(transDate);
+            query.setStartDate(startDate);
+            query.setEndDate(endDate);
             query.setParam1(scene);
             List<TPayOrder> list = tPayOrderMapper.selectMchOrderIdList(query);
             Long amt = tPayOrderMapper.selectMchTotalAmt(query);
@@ -109,7 +153,7 @@ public class PayOrderServiceImpl extends BaseService implements IPayOrderService
                 jsonObject.put("deviceSn",tPayOrder.getDeviceSn());
                 jsonObject.put("scene", MyChannelUtil.getSceneName(tPayOrder.getParam1()));
                 jsonObject.put("transDate",tPayOrder.getTransDate());
-                jsonObject.put("transTime",tPayOrder.getCreatetime());
+                jsonObject.put("transTime", DateUtil.format(tPayOrder.getCreatetime(), DatePattern.NORM_DATETIME_PATTERN));
                 jsonArray.add(jsonObject);
             }
             jsonObjectRe.put("orderList",jsonArray.toJSONString());

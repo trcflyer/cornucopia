@@ -39,8 +39,8 @@ public class AmountUtil {
      * @return
      */
     public static String convertCent2Dollar(String s) {
-        if("".equals(s) || s ==null){
-            return "";
+        if("".equals(s) || s ==null || "null" == s){
+            return "0.00";
         }
         long l;
         if(s.length() != 0) {

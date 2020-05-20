@@ -52,17 +52,23 @@
         <include refid="com.easypay.cornucopiaallqrpay.dal.dao.TPayOrderMapper.Base_Column_List" />
         from t_pay_order
         <where>
-            <if test="transDate != null">
-                and  trans_date = #{transDate,jdbcType=VARCHAR}
-            </if>
             <if test="mchId != null">
                 and  Mch_Id = #{mchId,jdbcType=VARCHAR}
             </if>
             <if test="deviceSn != null">
                 and  device_Sn = #{deviceSn,jdbcType=VARCHAR}
             </if>
+            <if test="device != null">
+                and  device = #{device,jdbcType=VARCHAR}
+            </if>
             <if test="param1 != null">
                 and  Param1 = #{param1,jdbcType=VARCHAR}
+            </if>
+            <if test="startDate != null">
+                and  trans_date <![CDATA[ >= ]]> #{startDate,jdbcType=VARCHAR}
+            </if>
+            <if test="endDate != null">
+                and  trans_date <![CDATA[ <= ]]> #{endDate,jdbcType=VARCHAR}
             </if>
         </where>
         order by CreateTime desc
@@ -74,17 +80,49 @@
         sum(Amount)
         from t_pay_order
         <where>
-            <if test="transDate != null">
-                and  trans_date = #{transDate,jdbcType=VARCHAR}
-            </if>
             <if test="mchId != null">
                 and  Mch_Id = #{mchId,jdbcType=VARCHAR}
             </if>
             <if test="deviceSn != null">
                 and  device_Sn = #{deviceSn,jdbcType=VARCHAR}
             </if>
+            <if test="device != null">
+                and  device = #{device,jdbcType=VARCHAR}
+            </if>
             <if test="param1 != null">
                 and  Param1 = #{param1,jdbcType=VARCHAR}
+            </if>
+            <if test="startDate != null">
+                and  trans_date <![CDATA[ >= ]]> #{startDate,jdbcType=VARCHAR}
+            </if>
+            <if test="endDate != null">
+                and  trans_date <![CDATA[ <= ]]> #{endDate,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="selectMchTotalNum" resultType="java.lang.Long"
+    >
+        select
+        count(Mch_Id)
+        from t_pay_order
+        <where>
+            <if test="mchId != null">
+                and  Mch_Id = #{mchId,jdbcType=VARCHAR}
+            </if>
+            <if test="deviceSn != null">
+                and  device_Sn = #{deviceSn,jdbcType=VARCHAR}
+            </if>
+            <if test="device != null">
+                and  device = #{device,jdbcType=VARCHAR}
+            </if>
+            <if test="param1 != null">
+                and  Param1 = #{param1,jdbcType=VARCHAR}
+            </if>
+            <if test="startDate != null">
+                and  trans_date <![CDATA[ >= ]]> #{startDate,jdbcType=VARCHAR}
+            </if>
+            <if test="endDate != null">
+                and  trans_date <![CDATA[ <= ]]> #{endDate,jdbcType=VARCHAR}
             </if>
         </where>
     </select>

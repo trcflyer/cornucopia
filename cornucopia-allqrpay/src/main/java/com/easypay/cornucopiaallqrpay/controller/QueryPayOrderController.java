@@ -45,12 +45,11 @@ public class QueryPayOrderController {
      * 2)根据参数查询订单
      * 3)返回订单数据
      * @param request
-     * @param response
      * @return
      */
 
     @RequestMapping(value = "/pay/orderDetail")
-    public CommonResult queryPayOrder(HttpServletRequest request, HttpServletResponse response) {
+    public CommonResult queryPayOrder(HttpServletRequest request) {
         log.info("###### 开始接收商户查询支付订单请求 ######");
         String logPrefix = "【商户支付订单查询】";
         try {
@@ -132,18 +131,17 @@ public class QueryPayOrderController {
      * 2)根据参数查询订单
      * 3)返回订单数据
      * @param request
-     * @param response
      * @return
      */
 
     @RequestMapping(value = "/pay/orderList")
-    public CommonResult queryPayOrderList(HttpServletRequest request, HttpServletResponse response) {
+    public CommonResult queryPayOrderList(HttpServletRequest request) {
         log.info("###### 开始接收商户查询支付订单列表请求 ######");
         String logPrefix = "【商户支付订单列表查询】";
         try {
             JSONObject payContext = new JSONObject();
             // 验证参数有效性
-            String errorMessage = validateParamsList(request, payContext);
+            String errorMessage = validateParamsList(request);
             if (!"success".equalsIgnoreCase(errorMessage)) {
                 log.warn(errorMessage);
                 return CommonResult.failed(ResultCode.CODE_999,"必填参数不可为空");
@@ -153,10 +151,11 @@ public class QueryPayOrderController {
             String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
             String pageNum = request.getParameter("pageNum");
             String pageSize = request.getParameter("pageSize");
-            String transDate = request.getParameter("transDate");
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
             String scene = request.getParameter("scene");
 
-            JSONObject orderInfo = payOrderService.queryPayOrderList(mchId, deviceSn,pageNum,pageSize,transDate,scene);
+            JSONObject orderInfo = payOrderService.queryPayOrderList(mchId, deviceSn,pageNum,pageSize,startDate,endDate,scene);
             log.info("{}查询支付订单,结果:{}", logPrefix, orderInfo);
             if (orderInfo == null) {
                 return CommonResult.failed(ResultCode.CODE_999,"支付订单列表为空");
@@ -176,14 +175,15 @@ public class QueryPayOrderController {
      * @param request
      * @return
      */
-    private String validateParamsList(HttpServletRequest request, JSONObject payContext) {
+    private String validateParamsList(HttpServletRequest request) {
         // 验证请求参数,参数有问题返回错误提示
         String errorMessage;
         // 支付参数
         String mchId = request.getParameter("mchId"); 			    // 商户ID
         String pageNum = request.getParameter("pageNum");
         String pageSize = request.getParameter("pageSize");
-        String transDate = request.getParameter("transDate");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
 
 
         // 验证请求参数有效性（必选项）
@@ -191,14 +191,90 @@ public class QueryPayOrderController {
             errorMessage = "request params[mchId] error.";
             return errorMessage;
         }
-        if(StringUtils.isBlank(transDate)) {
-            errorMessage = "request params[transDate] error.";
+        if(StringUtils.isBlank(startDate)) {
+            errorMessage = "request params[startDate] error.";
+            return errorMessage;
+        }
+        if(StringUtils.isBlank(endDate)) {
+            errorMessage = "request params[endDate] error.";
             return errorMessage;
         }
         if(StringUtils.isBlank(pageNum)||StringUtils.isBlank(pageSize)) {
             return "分页查询参数不可为空";
         }
 
+        // 查询商户信息
+        ResultCode respCode = checkMerIdBiz.checkMer(mchId);
+        if (!ResultCode.SUCCESS.equals(respCode)) {
+            errorMessage = "商户号错误";
+            return errorMessage;
+        }
+        return "success";
+    }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/pay/orderStatis")
+    public CommonResult queryPayOrderStatis(HttpServletRequest request) {
+        log.info("###### 开始接收商户查询支付订单列表请求 ######");
+        String logPrefix = "【商户支付订单列表查询】";
+        try {
+            // 验证参数有效性
+            String errorMessage = validateParamsStatis(request);
+            if (!"success".equalsIgnoreCase(errorMessage)) {
+                log.warn(errorMessage);
+                return CommonResult.failed(ResultCode.CODE_999,"必填参数不可为空");
+            }
+            log.debug("请求参数及签名校验通过");
+            String mchId = request.getParameter("mchId"); 			    // 商户ID
+            String deviceSn = request.getParameter("deviceSn"); 	// 支付订单号
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
+            String scene = request.getParameter("scene");
+
+            JSONObject orderInfo = payOrderService.queryPayOrderStatistics(mchId, deviceSn,startDate,endDate);
+            log.info("{}查询支付订单,结果:{}", logPrefix, orderInfo);
+            if (orderInfo == null) {
+                return CommonResult.failed(ResultCode.CODE_999,"支付订单列表为空");
+            }
+            Map<String,String> mapResult = new HashMap<>();
+            mapResult.put("mchId",mchId);
+            mapResult.putAll(JSONObject.parseObject(orderInfo.toJSONString(),HashMap.class));
+            return CommonResult.success(JSONObject.toJSONString(mapResult));
+        }catch (Exception e) {
+            log.error(e.getMessage(), "");
+            return CommonResult.failed(ResultCode.CODE_998,"支付系统异常");
+        }
+    }
+    /**
+     * 验证创建订单请求参数,参数通过返回JSONObject对象,否则返回错误文本信息
+     * @param request
+     * @return
+     */
+    private String validateParamsStatis(HttpServletRequest request) {
+        // 验证请求参数,参数有问题返回错误提示
+        String errorMessage;
+        // 支付参数
+        String mchId = request.getParameter("mchId"); 			    // 商户ID
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+
+        // 验证请求参数有效性（必选项）
+        if(StringUtils.isBlank(mchId)) {
+            errorMessage = "request params[mchId] error.";
+            return errorMessage;
+        }
+        if(StringUtils.isBlank(startDate)) {
+            errorMessage = "request params[startDate] error.";
+            return errorMessage;
+        }
+        if(StringUtils.isBlank(endDate)) {
+            errorMessage = "request params[endDate] error.";
+            return errorMessage;
+        }
         // 查询商户信息
         ResultCode respCode = checkMerIdBiz.checkMer(mchId);
         if (!ResultCode.SUCCESS.equals(respCode)) {
