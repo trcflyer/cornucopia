@@ -1,5 +1,6 @@
 package com.easypay.cornucopiaallqrpay.interceptor;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -13,21 +14,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+
 @Slf4j
 @Component
 public class LogInterceptor implements HandlerInterceptor {
     private final static String TRACEID = "traceId";
+    private final static String CREATE_ORDER = "/allqrpay/api/pay/create_order";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String traceId = request.getParameter(TRACEID);
-        if(StringUtils.isBlank(traceId)){
-            traceId = UUID.randomUUID().toString().replace("-","");
+        Map<String, String> requestMap = null;
+        requestMap = getAllRequestParam(request);
+        String traceId = requestMap.get(TRACEID);
+        if(CREATE_ORDER.equals( request.getRequestURI())){
+            traceId = JSONObject.parseObject(requestMap.get("params")).getString(TRACEID);
+        }
+        if (StringUtils.isBlank(traceId)) {
+            traceId = UUID.randomUUID().toString().replace("-", "");
         }
         MDC.put(TRACEID, traceId);
         getRequestIp(request);
-        request.setAttribute(TRACEID, traceId);
-        Map<String, String> requestMap = getAllRequestParam(request);
-        log.info("请求地址为:{},请求参数为:{}",request.getRequestURI(),requestMap);
+        log.info("请求地址为:{},请求参数为:{}", request.getRequestURI(), requestMap);
         return true;
     }
 
@@ -43,7 +50,8 @@ public class LogInterceptor implements HandlerInterceptor {
         }
         return res;
     }
-    private void getRequestIp(HttpServletRequest request){
+
+    private void getRequestIp(HttpServletRequest request) {
         // 获取请求IP地址
         String ipAddr = request.getHeader("X-Forwarded-For");
         if (ipAddr == null || ipAddr.trim().length() == 0) {

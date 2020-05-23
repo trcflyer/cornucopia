@@ -355,7 +355,8 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         ExtendParams extendParams = new ExtendParams();
         extendParams.setSysServiceProviderId("");
         model.setExtendParams(extendParams);
-
+        
+        alipay_request.putOtherTextParam("app_auth_token", payChannel.getAliAppAuthToken());
         alipay_request.setBizModel(model);
         // 设置异步通知地址
         alipay_request.setNotifyUrl(alipayConfig.getNotify_url());

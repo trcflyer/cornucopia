@@ -70,6 +70,7 @@
             <if test="endDate != null">
                 and  trans_date <![CDATA[ <= ]]> #{endDate,jdbcType=VARCHAR}
             </if>
+            and status = 2
         </where>
         order by CreateTime desc
     </select>
@@ -98,6 +99,7 @@
             <if test="endDate != null">
                 and  trans_date <![CDATA[ <= ]]> #{endDate,jdbcType=VARCHAR}
             </if>
+            and status = 2
         </where>
     </select>
     <select id="selectMchTotalNum" resultType="java.lang.Long"
@@ -124,6 +126,7 @@
             <if test="endDate != null">
                 and  trans_date <![CDATA[ <= ]]> #{endDate,jdbcType=VARCHAR}
             </if>
+            and status = 2
         </where>
     </select>
 </mapper>

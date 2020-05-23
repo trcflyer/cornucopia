@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.easypay.cornucopiacommon.constant.PayConstant;
 import com.easypay.cornucopiacommon.constant.PayEnum;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -97,5 +99,26 @@ public class XXPayUtil {
             urlParam.append("&");
         }
         return urlParam.toString();
+    }
+
+    /**
+     * 发起HTTP/HTTPS请求(method=POST)
+     * @param url
+     * @return
+     */
+    public static String call4Post(String url) {
+        try {
+            URL url1 = new URL(url);
+            if("https".equals(url1.getProtocol())) {
+                return HttpClient.callHttpsPost(url);
+            }else if("http".equals(url1.getProtocol())) {
+                return HttpClient.callHttpPost(url);
+            }else {
+                return "";
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

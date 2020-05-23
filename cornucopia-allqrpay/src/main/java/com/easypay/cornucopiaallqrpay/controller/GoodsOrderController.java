@@ -1,6 +1,5 @@
 package com.easypay.cornucopiaallqrpay.controller;
 
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.easypay.cornucopiaallqrpay.DefaultRequestValue;
@@ -15,6 +14,7 @@ import com.easypay.cornucopiacommon.result.ResultCode;
 import com.easypay.cornucopiacommon.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -72,6 +72,7 @@ public class GoodsOrderController {
         paramMap.put("param2", "");                         // 扩展参数2 ORD_ID_SQE
         paramMap.put("mchOrderId",  DateUtils.getCurrentTimeStrDefault().substring(0,8)+StringUtils.leftPad(sequenceBiz.getSeqId("ORD_ID_SQE"),12,"0"));
 
+        paramMap.put("traceId", MDC.get("traceId"));
 
         JSONObject extra = new JSONObject();
         extra.put("openId", params.get("openId"));
@@ -83,19 +84,16 @@ public class GoodsOrderController {
             log.info("签名异常", e.getMessage());
             return null;
         }
-
-        JSONObject requestJSONObject = new JSONObject();
-        requestJSONObject.put("params", JSONObject.toJSONString(paramMap));
+        String reqData = "params=" + JSONObject.toJSONString(paramMap);
         log.info("请求支付中心下单接口,请求数据:" + JSONObject.toJSONString(paramMap));
         String url = defaultRequestValue.getBaseUrl() + "/api/pay/create_order?";
-        String result = HttpUtil.post(url, JSONObject.toJSONString(paramMap));
-
+        String result =   XXPayUtil.call4Post(url + reqData);
         log.info("请求支付中心下单接口,响应数据:" + result);
         Map retMap = JSON.parseObject(result);
         if ("SUCCESS".equals(retMap.get("retCode"))) {
-            log.info("=========支付中心下单成功=========");
+            log.info("支付中心下单成功");
         }else{
-            log.info("=========支付中心下单失败=========");
+            log.info("支付中心下单失败");
             return null;
         }
         return retMap;
