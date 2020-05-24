@@ -1,5 +1,7 @@
 package com.easypay.cornucopiaallqrpay.controller;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.easypay.cornucopiaallqrpay.biz.CheckMerIdBiz;
 import com.easypay.cornucopiaallqrpay.service.IPayOrderService;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,6 +75,8 @@ public class QueryPayOrderController {
             mapResult.put("ordAmt",AmountUtil.convertCent2Dollar(String.valueOf(payOrder.get("amount"))));
             mapResult.put("ordStatus",payOrder.getString("status"));
             mapResult.put("scene", MyChannelUtil.getSceneName(payOrder.getString("param1")));
+            mapResult.put("transDate",payOrder.getString("transDate"));
+            mapResult.put("transTime", DateUtil.format(new Date(Long.valueOf(payOrder.getString("createtime"))), DatePattern.NORM_DATETIME_PATTERN));
             return CommonResult.success(JSONObject.toJSONString(mapResult));
         }catch (Exception e) {
             log.error(e.getMessage(), "");

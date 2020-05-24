@@ -107,7 +107,7 @@ public class GoodsOrderController {
      * @return
      */
     @RequestMapping("/createQrPay.html")
-    public String openQrPay(ModelMap model, String mchId) {
+    public String openQrPay(ModelMap model, String mchId,String subMchId,String deviceSn) {
         if (StringUtils.isBlank(mchId)) {
             model.put("dealMessage", "请求参数错误");
             return "dealMessage";

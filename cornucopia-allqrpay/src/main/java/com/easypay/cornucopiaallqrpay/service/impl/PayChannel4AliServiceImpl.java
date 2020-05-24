@@ -272,6 +272,11 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
                 log.error("{}objParams参数格式错误！", logPrefix);
             }
         }
+        //业务扩展参数	系统商返佣数据提取的依据
+        ExtendParams extendParams = new ExtendParams();
+        extendParams.setSysServiceProviderId("2088731736410167");
+        model.setExtendParams(extendParams);
+
         alipay_request.putOtherTextParam("app_auth_token", payChannel.getAliAppAuthToken());
         alipay_request.setBizModel(model);
         // 设置异步通知地址
@@ -353,7 +358,7 @@ public class PayChannel4AliServiceImpl extends BaseService implements IPayChanne
         }
         //业务扩展参数	系统商返佣数据提取的依据
         ExtendParams extendParams = new ExtendParams();
-        extendParams.setSysServiceProviderId("");
+        extendParams.setSysServiceProviderId("2088731736410167");
         model.setExtendParams(extendParams);
         
         alipay_request.putOtherTextParam("app_auth_token", payChannel.getAliAppAuthToken());
